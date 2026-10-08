@@ -1,6 +1,7 @@
 package com.example.featuremanagement.service;
 
 import com.example.featuremanagement.dto.CreateFlagRequest;
+import com.example.featuremanagement.dto.CreateFlagResult;
 import com.example.featuremanagement.dto.FeatureFlagResponse;
 import com.example.featuremanagement.dto.UpdateFlagRequest;
 import com.example.featuremanagement.entity.FeatureFlag;
@@ -29,6 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -71,6 +73,7 @@ class FeatureFlagServiceTest {
 
 	@Test
 	void createFlagPersistsAndAudits() {
+		when(auditService.findFlagIdForIdempotentRequest("req-1", "FLAG_CREATED")).thenReturn(Optional.empty());
 		when(repository.existsByName("dark-mode")).thenReturn(false);
 		when(repository.saveAndFlush(any(FeatureFlag.class))).thenAnswer(invocation -> {
 			FeatureFlag flag = invocation.getArgument(0);
@@ -79,20 +82,40 @@ class FeatureFlagServiceTest {
 			return flag;
 		});
 
-		FeatureFlagResponse created = featureFlagService.createFlag(
+		CreateFlagResult created = featureFlagService.createFlag(
 				new CreateFlagRequest("dark-mode", "Theme", false, FlagState.ACTIVE),
 				"admin-1",
 				"req-1"
 		);
 
-		assertThat(created.name()).isEqualTo("dark-mode");
-		assertThat(created.state()).isEqualTo(FlagState.ACTIVE);
+		assertThat(created.idempotentReplay()).isFalse();
+		assertThat(created.flag().name()).isEqualTo("dark-mode");
+		assertThat(created.flag().state()).isEqualTo(FlagState.ACTIVE);
 		verify(auditService).record(any(Long.class), eq("FLAG_CREATED"), eq("admin-1"), any(Map.class), eq("req-1"));
 		verify(featureCacheService).putFlag(any());
 	}
 
 	@Test
+	void createFlagReplaysIdempotentRequest() {
+		FeatureFlag existing = new FeatureFlag("dark-mode", "Theme", false, "admin-1");
+		ReflectionTestUtils.setField(existing, "id", 9L);
+		when(auditService.findFlagIdForIdempotentRequest("req-1", "FLAG_CREATED")).thenReturn(Optional.of(9L));
+		when(repository.findById(9L)).thenReturn(Optional.of(existing));
+
+		CreateFlagResult replayed = featureFlagService.createFlag(
+				new CreateFlagRequest("dark-mode", "Theme", false, FlagState.ACTIVE),
+				"admin-1",
+				"req-1"
+		);
+
+		assertThat(replayed.idempotentReplay()).isTrue();
+		assertThat(replayed.flag().name()).isEqualTo("dark-mode");
+		verify(repository, never()).saveAndFlush(any());
+	}
+
+	@Test
 	void createFlagRejectsDuplicate() {
+		when(auditService.findFlagIdForIdempotentRequest("req-1", "FLAG_CREATED")).thenReturn(Optional.empty());
 		when(repository.existsByName("dark-mode")).thenReturn(true);
 
 		assertThatThrownBy(() -> featureFlagService.createFlag(

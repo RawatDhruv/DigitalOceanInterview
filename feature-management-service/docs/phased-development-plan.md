@@ -22,10 +22,12 @@ This document defines an incremental delivery plan from a runnable Spring Boot f
 | ----------------------------- | ------ | ----------------------------------------------------- |
 | **M1 — Functional MVP**       | 1–5    | CRUD, overrides, evaluation using PostgreSQL          |
 | **M2 — Data integrity**       | 6      | Audit trail and atomic writes                         |
-| **M3 — Scalable evaluation**  | 7–8    | Redis caching and reliable cache synchronization      |
-| **M4 — Production hardening** | 9–11   | Security, error handling, automated tests, monitoring |
+| **M3 — Scalable evaluation**  | 7      | Redis caching with TTL + best-effort post-commit refresh |
+| **M4 — Production hardening** | 10–11  | Error handling, automated tests, monitoring, README   |
 | **M5 — Deployment**           | 12     | Running on DigitalOcean infrastructure                |
 
+
+> **Scope note (time-boxed delivery):** **Phase 8** (transactional outbox / cache sync worker) and **Phase 9** (Spring Security) are **skipped**. Cache freshness relies on short TTLs plus best-effort after-commit Redis updates from Phase 7. Management and evaluation APIs remain open locally (`X-Actor-Id` header only); authz is deferred.
 
 ---
 
@@ -339,6 +341,8 @@ Warm evaluations use Redis, cold evaluations fall back to PostgreSQL, and all ev
 
 ## Phase 8 — Transactional Outbox and Reliable Cache Synchronization
 
+> **Skipped** for this delivery. Retained below as a future backlog item. Until then, mutations use Phase 7 best-effort after-commit cache put/evict; Redis outages do not fail DB writes; stale cache entries expire via TTL.
+
 **Goal:** Make Redis cache synchronization reliable after database mutations.
 
 ### Database migration
@@ -380,6 +384,8 @@ An unavailable Redis instance cannot cause the database update to lose its audit
 ---
 
 ## Phase 9 — Spring Security
+
+> **Skipped** for this delivery. Retained below as a future backlog item. Local/dev callers identify via `X-Actor-Id` (default `local-admin`); no JWT/OAuth2 enforcement yet.
 
 **Goal:** Restrict management operations; allow trusted callers for evaluation.
 
@@ -544,7 +550,7 @@ The service is not complete until all of the following are implemented and demon
 
 | #   | Expectation                                                                                                                        | Where it lands in the plan  |
 | --- | ---------------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
-| 1   | **Architecture diagram** — evaluation request path; where Redis sits; when consulted, bypassed, or invalidated/updated             | HLD §06; README; Phases 7–8 |
+| 1   | **Architecture diagram** — evaluation request path; where Redis sits; when consulted, bypassed, or invalidated/updated             | HLD §06; README; Phase 7 (outbox sync deferred with Phase 8) |
 | 2   | **Validation & error handling** — flag names (no spaces, length limits); correct status codes (`404` for non-existent flags, etc.) | Phases 3, 5, 10             |
 | 3   | **Unit tests + one HTTP e2e integration test**                                                                                     | Phases 2–5, 11              |
 | 4   | **CI/CD via GitHub Actions**                                                                                                       | Phases 11–12                |
@@ -553,11 +559,11 @@ The service is not complete until all of the following are implemented and demon
 
 ### Checklist
 
-- [ ] Evaluation-path architecture diagram (cache consult / bypass / invalidate)
-- [ ] Flag name validation and consistent HTTP errors including `404`
-- [ ] Unit tests for core rules + at least one HTTP end-to-end integration test
-- [ ] GitHub Actions CI running `./gradlew test`
-- [ ] README covers setup, evaluation rules, and caching behavior
+- [x] Evaluation-path architecture diagram (cache consult / bypass / invalidate) — HLD §06 + README link
+- [x] Flag name validation and consistent HTTP errors including `404` / `503`
+- [x] Unit tests for core rules + at least one HTTP end-to-end integration test
+- [x] GitHub Actions CI running `./gradlew :feature-management-service:test`
+- [x] README covers setup, evaluation rules, and caching behavior
 
 ---
 
@@ -567,7 +573,7 @@ This plan gives both a working service and a clear progression you can explain i
 
 1. **Phases 1–5:** Correct domain behavior on PostgreSQL alone (unique flag names, overrides, evaluation).
 2. **Phase 6:** Write-time correctness with an immutable audit trail.
-3. **Phases 7–8:** Low-latency reads with explicit eventual consistency via outbox sync.
-4. **Phases 9–11:** Security, resilience, tests/CI, README, and evidence of operability.
+3. **Phase 7:** Low-latency reads via Redis with TTL and DB fallback (outbox sync deferred).
+4. **Phases 10–11:** Resilience, tests/CI, README, and evidence of operability (Spring Security deferred).
 5. **Phase 12:** Deploy and operate on DigitalOcean infrastructure.
 

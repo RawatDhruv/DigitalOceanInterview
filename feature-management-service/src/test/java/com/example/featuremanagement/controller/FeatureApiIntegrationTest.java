@@ -40,10 +40,26 @@ class FeatureApiIntegrationTest {
 						  "globalEnabled": false,
 						  "state": "ACTIVE"
 						}
-						"""
+						""",
+				"idem-new-checkout"
 		);
 		assertThat(create.statusCode()).isEqualTo(201);
 		assertThat(objectMapper.readTree(create.body()).get("name").asText()).isEqualTo("new-checkout");
+
+		HttpResponse<String> createReplay = send(
+				"POST",
+				"/api/v1/flags",
+				"""
+						{
+						  "name": "new-checkout",
+						  "description": "Checkout flow",
+						  "globalEnabled": false,
+						  "state": "ACTIVE"
+						}
+						""",
+				"idem-new-checkout"
+		);
+		assertThat(createReplay.statusCode()).isEqualTo(200);
 
 		HttpResponse<String> duplicate = send(
 				"POST",
@@ -157,8 +173,15 @@ class FeatureApiIntegrationTest {
 	}
 
 	private HttpResponse<String> send(String method, String path, String body) throws Exception {
+		return send(method, path, body, null);
+	}
+
+	private HttpResponse<String> send(String method, String path, String body, String idempotencyKey) throws Exception {
 		HttpRequest.Builder builder = HttpRequest.newBuilder(URI.create("http://localhost:" + port + path))
 				.header("X-Actor-Id", "test-admin");
+		if (idempotencyKey != null) {
+			builder.header("Idempotency-Key", idempotencyKey);
+		}
 
 		if (body != null) {
 			builder.header("Content-Type", MediaType.APPLICATION_JSON_VALUE)

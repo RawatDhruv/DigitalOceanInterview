@@ -24,8 +24,16 @@ app:
     flag-ttl: 30s
     override-ttl: 30s
     inherit-ttl: 15s
+  resilience:
+    db-fallback-max-concurrent: 32
+    db-fallback-failure-threshold: 5
+    db-fallback-open-duration: 2s
 
 management:
   health:
     redis:
       enabled: false
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics

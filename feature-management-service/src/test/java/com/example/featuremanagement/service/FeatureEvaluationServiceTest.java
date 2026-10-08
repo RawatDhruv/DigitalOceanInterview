@@ -3,20 +3,22 @@ package com.example.featuremanagement.service;
 import com.example.featuremanagement.cache.CachedFlag;
 import com.example.featuremanagement.cache.CachedOverride;
 import com.example.featuremanagement.cache.OverrideCacheValue;
+import com.example.featuremanagement.config.ResilienceProperties;
 import com.example.featuremanagement.dto.EvaluationResponse;
 import com.example.featuremanagement.entity.EvaluationReason;
 import com.example.featuremanagement.entity.FeatureFlag;
 import com.example.featuremanagement.entity.FeatureOverride;
 import com.example.featuremanagement.exception.FeatureNotFoundException;
 import com.example.featuremanagement.repository.FeatureOverrideRepository;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Optional;
 
@@ -40,7 +42,6 @@ class FeatureEvaluationServiceTest {
 	@Mock
 	private FeatureCacheService featureCacheService;
 
-	@InjectMocks
 	private FeatureEvaluationService evaluationService;
 
 	private FeatureFlag enabledFlag;
@@ -56,6 +57,16 @@ class FeatureEvaluationServiceTest {
 		disabledFlag = new FeatureFlag("new-checkout", "Checkout", false, "admin-1");
 		ReflectionTestUtils.setField(disabledFlag, "id", flagId);
 		ReflectionTestUtils.setField(disabledFlag, "updatedAt", Instant.parse("2026-01-01T00:00:00Z"));
+
+		DbFallbackGuard guard = new DbFallbackGuard(new ResilienceProperties(32, 5, Duration.ofSeconds(2)));
+		FeatureMetrics metrics = new FeatureMetrics(new SimpleMeterRegistry());
+		evaluationService = new FeatureEvaluationService(
+				featureFlagService,
+				overrideRepository,
+				featureCacheService,
+				guard,
+				metrics
+		);
 	}
 
 	@Test

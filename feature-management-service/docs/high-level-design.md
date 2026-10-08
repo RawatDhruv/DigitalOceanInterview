@@ -30,6 +30,8 @@ Design a reliable, low-latency feature flag platform supporting administrative C
 
 > **Primary business rule:** An explicit per-user value (`true` or `false`) wins over the global value. Missing or removed overrides inherit `global_enabled`.
 
+> **Delivery scope:** The transactional **outbox worker** and **Spring Security / OAuth2** sections below describe the target architecture. For the time-boxed implementation they are **deferred** (see phased plan Phases 8–9 skipped). Current cache sync is best-effort after-commit Redis put/evict plus TTL; callers use `X-Actor-Id` without JWT enforcement.
+
 ---
 
 ## 01 / Requirements
@@ -255,7 +257,7 @@ flowchart LR
 | Cache miss | Read PostgreSQL, populate Redis with entry + `updatedAt` + TTL, continue evaluation. |
 | Flag missing | Return `404`; do not invent a disabled value. |
 | Redis unavailable | Bypass Redis; bounded read-through to PostgreSQL with rate limiting / circuit breaker. |
-| Admin mutation committed | Do not require synchronous Redis write in the request path; insert outbox event atomically with DB + audit. |
+| Admin mutation committed | Target: insert outbox event atomically with DB + audit (deferred). Current: best-effort after-commit Redis put/evict; TTL bounds staleness. |
 | Outbox worker processes event | Timestamp-aware Redis update / invalidation; reject stale `updatedAt` values. |
 | Override removed | Store `INHERIT` tombstone in DB and cache so old values cannot resurrect until TTL/outbox catches up. |
 | TTL expiry | Entry expires; next read is a miss and reloads from PostgreSQL. |

@@ -4,6 +4,7 @@ import com.example.featuremanagement.cache.CachedFlag;
 import com.example.featuremanagement.cache.CachedOverride;
 import com.example.featuremanagement.cache.OverrideCacheValue;
 import com.example.featuremanagement.config.CacheProperties;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,7 +47,11 @@ class FeatureCacheServiceTest {
 				Duration.ofSeconds(30),
 				Duration.ofSeconds(15)
 		);
-		featureCacheService = new FeatureCacheService(redisTemplate, properties);
+		featureCacheService = new FeatureCacheService(
+				redisTemplate,
+				properties,
+				new FeatureMetrics(new SimpleMeterRegistry())
+		);
 	}
 
 	@Test

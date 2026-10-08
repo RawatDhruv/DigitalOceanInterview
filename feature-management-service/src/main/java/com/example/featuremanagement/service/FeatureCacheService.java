@@ -57,13 +57,16 @@ public class FeatureCacheService {
 
 	private final StringRedisTemplate redisTemplate;
 	private final CacheProperties cacheProperties;
+	private final FeatureMetrics featureMetrics;
 
 	public Optional<CachedFlag> getFlag(String name) {
 		try {
 			Map<Object, Object> entries = redisTemplate.opsForHash().entries(flagKey(name));
 			if (entries == null || entries.isEmpty()) {
+				featureMetrics.recordCacheMiss();
 				return Optional.empty();
 			}
+			featureMetrics.recordCacheHit();
 			return Optional.of(new CachedFlag(
 					Long.parseLong(stringField(entries, FIELD_FLAG_ID)),
 					stringField(entries, FIELD_NAME),
@@ -73,6 +76,8 @@ public class FeatureCacheService {
 		}
 		catch (Exception ex) {
 			log.warn("Redis flag read failed for name={}: {}", name, ex.toString());
+			featureMetrics.recordRedisFailure();
+			featureMetrics.recordCacheMiss();
 			return Optional.empty();
 		}
 	}
@@ -97,8 +102,10 @@ public class FeatureCacheService {
 		try {
 			Map<Object, Object> entries = redisTemplate.opsForHash().entries(overrideKey(flagId, userId));
 			if (entries == null || entries.isEmpty()) {
+				featureMetrics.recordCacheMiss();
 				return Optional.empty();
 			}
+			featureMetrics.recordCacheHit();
 			return Optional.of(new CachedOverride(
 					OverrideCacheValue.valueOf(stringField(entries, FIELD_VALUE)),
 					Instant.parse(stringField(entries, FIELD_UPDATED_AT))
@@ -106,6 +113,8 @@ public class FeatureCacheService {
 		}
 		catch (Exception ex) {
 			log.warn("Redis override read failed for flagId={} userId={}: {}", flagId, userId, ex.toString());
+			featureMetrics.recordRedisFailure();
+			featureMetrics.recordCacheMiss();
 			return Optional.empty();
 		}
 	}
@@ -149,6 +158,7 @@ public class FeatureCacheService {
 		}
 		catch (Exception ex) {
 			log.warn("Redis write failed for key={}: {}", key, ex.toString());
+			featureMetrics.recordRedisFailure();
 		}
 	}
 
@@ -158,6 +168,7 @@ public class FeatureCacheService {
 		}
 		catch (Exception ex) {
 			log.warn("Redis delete failed for key={}: {}", key, ex.toString());
+			featureMetrics.recordRedisFailure();
 		}
 	}
 

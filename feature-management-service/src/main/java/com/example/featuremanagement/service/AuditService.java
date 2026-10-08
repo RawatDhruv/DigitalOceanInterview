@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,5 +27,14 @@ public class AuditService {
 		FeatureAudit audit = new FeatureAudit(flagId, action, actorId, changeMap, requestId);
 		auditRepository.save(audit);
 		log.debug("Persisted audit: action={}, flagId={}, actor={}", action, flagId, actorId);
+	}
+
+	@Transactional(readOnly = true)
+	public Optional<Long> findFlagIdForIdempotentRequest(String requestId, String action) {
+		if (requestId == null || requestId.isBlank()) {
+			return Optional.empty();
+		}
+		return auditRepository.findFirstByRequestIdAndActionOrderByCreatedAtAsc(requestId, action)
+				.map(FeatureAudit::getFlagId);
 	}
 }

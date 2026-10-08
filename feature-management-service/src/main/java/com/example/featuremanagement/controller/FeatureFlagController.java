@@ -1,6 +1,7 @@
 package com.example.featuremanagement.controller;
 
 import com.example.featuremanagement.dto.CreateFlagRequest;
+import com.example.featuremanagement.dto.CreateFlagResult;
 import com.example.featuremanagement.dto.FeatureFlagResponse;
 import com.example.featuremanagement.dto.UpdateFlagRequest;
 import com.example.featuremanagement.service.FeatureFlagService;
@@ -33,6 +34,7 @@ public class FeatureFlagController {
 
 	private static final String ACTOR_HEADER = "X-Actor-Id";
 	private static final String REQUEST_ID_HEADER = "X-Request-Id";
+	private static final String IDEMPOTENCY_HEADER = "Idempotency-Key";
 	private static final String DEFAULT_ACTOR = "local-admin";
 
 	private final FeatureFlagService featureFlagService;
@@ -41,9 +43,16 @@ public class FeatureFlagController {
 	public ResponseEntity<FeatureFlagResponse> create(
 			@Valid @RequestBody CreateFlagRequest request,
 			@RequestHeader(value = ACTOR_HEADER, defaultValue = DEFAULT_ACTOR) String actor,
+			@RequestHeader(value = IDEMPOTENCY_HEADER, required = false) String idempotencyKey,
 			@RequestHeader(value = REQUEST_ID_HEADER, required = false) String requestId) {
-		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(featureFlagService.createFlag(request, actor, RequestIds.resolve(requestId)));
+		CreateFlagResult result = featureFlagService.createFlag(
+				request,
+				actor,
+				RequestIds.optional(idempotencyKey, requestId)
+		);
+		return ResponseEntity
+				.status(result.idempotentReplay() ? HttpStatus.OK : HttpStatus.CREATED)
+				.body(result.flag());
 	}
 
 	@GetMapping

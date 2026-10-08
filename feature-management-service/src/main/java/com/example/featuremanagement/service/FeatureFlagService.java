@@ -2,6 +2,7 @@ package com.example.featuremanagement.service;
 
 import com.example.featuremanagement.cache.CachedFlag;
 import com.example.featuremanagement.dto.CreateFlagRequest;
+import com.example.featuremanagement.dto.CreateFlagResult;
 import com.example.featuremanagement.dto.FeatureFlagResponse;
 import com.example.featuremanagement.dto.UpdateFlagRequest;
 import com.example.featuremanagement.entity.FeatureFlag;
@@ -15,6 +16,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -44,7 +47,16 @@ public class FeatureFlagService {
 	}
 
 	@Transactional
-	public FeatureFlagResponse createFlag(CreateFlagRequest request, String actor, String requestId) {
+	public CreateFlagResult createFlag(CreateFlagRequest request, String actor, String clientRequestKey) {
+		if (clientRequestKey != null && !clientRequestKey.isBlank()) {
+			var existingFlagId = auditService.findFlagIdForIdempotentRequest(clientRequestKey, "FLAG_CREATED");
+			if (existingFlagId.isPresent()) {
+				FeatureFlag existing = repository.findById(existingFlagId.get())
+						.orElseThrow(() -> new FeatureNotFoundException(request.name()));
+				return new CreateFlagResult(FeatureFlagResponse.from(existing), true);
+			}
+		}
+
 		if (repository.existsByName(request.name())) {
 			throw new DuplicateFeatureException(request.name());
 		}
@@ -68,9 +80,12 @@ public class FeatureFlagService {
 				.put("globalEnabled", null, saved.isGlobalEnabled())
 				.put("state", null, initialState.name());
 
-		auditService.record(saved.getId(), "FLAG_CREATED", actor, changeMap.toMap(), requestId);
+		String auditRequestId = (clientRequestKey == null || clientRequestKey.isBlank())
+				? UUID.randomUUID().toString()
+				: clientRequestKey;
+		auditService.record(saved.getId(), "FLAG_CREATED", actor, changeMap.toMap(), auditRequestId);
 		scheduleFlagCachePut(saved);
-		return FeatureFlagResponse.from(saved);
+		return new CreateFlagResult(FeatureFlagResponse.from(saved), false);
 	}
 
 	@Transactional
