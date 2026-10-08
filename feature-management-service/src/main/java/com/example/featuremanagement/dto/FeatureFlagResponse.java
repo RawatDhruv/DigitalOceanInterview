@@ -4,10 +4,9 @@ import com.example.featuremanagement.entity.FeatureFlag;
 import com.example.featuremanagement.entity.FlagState;
 
 import java.time.Instant;
-import java.util.UUID;
 
 public record FeatureFlagResponse(
-		UUID id,
+		Long id,
 		String name,
 		String description,
 		boolean globalEnabled,

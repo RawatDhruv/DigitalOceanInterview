@@ -9,13 +9,14 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  type: UUID
+                  type: BIGINT
+                  autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
               - column:
                   name: flag_id
-                  type: UUID
+                  type: BIGINT
                   constraints:
                     nullable: false
               - column:
@@ -61,13 +62,14 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  type: UUID
+                  type: BIGINT
+                  autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
               - column:
                   name: flag_id
-                  type: UUID
+                  type: BIGINT
                   constraints:
                     nullable: false
               - column:

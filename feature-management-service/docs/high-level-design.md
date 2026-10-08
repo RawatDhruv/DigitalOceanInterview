@@ -142,10 +142,10 @@ One codebase and one primary deployable service. The diagram separates the manag
 
 | Entity | Key attributes / constraints |
 |---|---|
-| `feature_flags` | `id` (UUID PK); `name`; `description`; `global_enabled` BOOLEAN; created/updated actor and time; **UNIQUE(`name`)**. No `project_id`, `environment`, lifecycle `state`, or optimistic-lock `version` in V1. |
-| `feature_overrides` | (`flag_id`, `user_id`) composite PK; `enabled` BOOLEAN NULL; updated actor and time. `NULL` is an inheritance tombstone (override removed). |
-| `feature_audits` | `id`; `flag_id`; `action`; `actor_id`; `changed_at`; `request_id`; `change_map` JSONB. Append-only for application roles; index (`flag_id`, `changed_at` DESC). |
-| `outbox_events` | `id`; `aggregate_id`; `event_type`; `payload` JSONB; `created_at`; `processed_at`; `attempts`; pending-event index. |
+| `feature_flags` | `id` (**BIGINT** identity PK); `name`; `description`; `global_enabled` BOOLEAN; created/updated actor and time; **UNIQUE(`name`)**. No `project_id` / `environment` in V1. |
+| `feature_overrides` | (`flag_id` **BIGINT** FK, `user_id`) composite PK; `enabled` BOOLEAN NULL; updated actor and time. `NULL` is an inheritance tombstone (override removed). |
+| `feature_audits` | `id` (**BIGINT** identity PK); `flag_id` (**BIGINT**); `action`; `actor_id`; `created_at`; `request_id`; `change_map` JSONB. Append-only for application roles; index (`flag_id`, `created_at` DESC). No FK to flags so history is retained after delete. |
+| `outbox_events` | `id` (**BIGINT** identity PK); `aggregate_id` (**BIGINT** flag id); `event_type`; `payload` JSONB; `created_at`; `processed_at`; `attempts`; pending-event index. |
 
 ### Evaluation decision table
 
@@ -162,6 +162,7 @@ One codebase and one primary deployable service. The diagram separates the manag
 ### Key invariants
 
 - Flag names are immutable after creation and unique globally.
+- Surrogate keys are `BIGINT` identity values (API `id` / `flagId` fields are numbers, not UUIDs).
 - Delete removes the flag (and its overrides); audit history is retained.
 - User overrides do not store a complete user list inside the flag record.
 
@@ -266,15 +267,15 @@ flowchart LR
 | 1 | Authenticate; validate flag name and user ID. |
 | 2 | `GET ff:flag:{name}`; cache miss → read PostgreSQL primary and populate with `updatedAt`. |
 | 3 | If missing flag → `404`. |
-| 4 | `GET ff:override:{flagId}:{userHash}`; cache miss → read database and populate `TRUE`/`FALSE`/`INHERIT`. |
+| 4 | `GET ff:override:{flagId}:{userId}` (`flagId` is the BIGINT surrogate key); cache miss → read database and populate `TRUE`/`FALSE`/`INHERIT`. |
 | 5 | If override is `TRUE` or `FALSE` → use it. Otherwise use `global_enabled`. Return reason and value. |
 
 ### Cache contract
 
 | Entry | Model | Starting TTL |
 |---|---|---|
-| Flag metadata | `{flagId, globalEnabled, updatedAt}`; cached by name. | 30 s |
-| User override | `{value: TRUE\|FALSE\|INHERIT, updatedAt}`; cached per flag and hashed user. | 30 s |
+| Flag metadata | `{flagId (BIGINT), globalEnabled, updatedAt}`; cached by name. | 30 s |
+| User override | `{value: TRUE\|FALSE\|INHERIT, updatedAt}`; cached per flag id and user id. | 30 s |
 | Absent override | `INHERIT`; explicit negative cache entry. | 15 s |
 
 Use atomic compare-and-set (Lua script or equivalent): apply a cache update only if the incoming `updatedAt` is newer than the cached value. Store override removals as `INHERIT` tombstones in PostgreSQL and cache. TTL expiry can still permit short stale windows; the design is intentionally eventually consistent.

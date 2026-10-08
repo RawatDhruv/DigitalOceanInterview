@@ -16,5 +16,17 @@ services:
     volumes:
       - fms-postgres-data:/var/lib/postgresql/data
 
+  # Optional — local default is Homebrew Redis via scripts/start-local-redis.sh
+  redis:
+    image: redis:7-alpine
+    container_name: fms-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
 volumes:
   fms-postgres-data:

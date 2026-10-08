@@ -1,5 +1,6 @@
 package com.example.featuremanagement.service;
 
+import com.example.featuremanagement.cache.CachedOverride;
 import com.example.featuremanagement.dto.FeatureOverrideResponse;
 import com.example.featuremanagement.dto.UpsertOverrideRequest;
 import com.example.featuremanagement.entity.FeatureFlag;
@@ -20,6 +21,8 @@ public class FeatureOverrideService {
 	private final FeatureFlagService featureFlagService;
 	private final FeatureOverrideRepository overrideRepository;
 	private final AuditService auditService;
+	private final FeatureCacheService featureCacheService;
+	private final AfterCommitExecutor afterCommitExecutor;
 
 	@Transactional
 	public FeatureOverrideResponse upsertOverride(
@@ -36,13 +39,14 @@ public class FeatureOverrideService {
 		FeatureOverride override = existing.orElseGet(
 				() -> new FeatureOverride(flag.getId(), userId, null, actor));
 		override.upsertEnabled(request.enabled(), actor);
-		FeatureOverride saved = overrideRepository.save(override);
+		FeatureOverride saved = overrideRepository.saveAndFlush(override);
 
 		ChangeMap changeMap = ChangeMap.create()
 				.put("userId", null, userId)
 				.put("enabled", previous, saved.getEnabled());
 		auditService.record(flag.getId(), "OVERRIDE_UPSERTED", actor, changeMap.toMap(), requestId);
 
+		scheduleOverrideCachePut(flag.getId(), userId, saved);
 		return FeatureOverrideResponse.from(saved, flagName);
 	}
 
@@ -64,12 +68,19 @@ public class FeatureOverrideService {
 
 		Boolean previous = override.getEnabled();
 		override.markRemoved(actor);
-		overrideRepository.save(override);
+		FeatureOverride saved = overrideRepository.saveAndFlush(override);
 
 		ChangeMap changeMap = ChangeMap.create()
 				.put("userId", null, userId)
 				.put("enabled", previous, null);
 		auditService.record(flag.getId(), "OVERRIDE_REMOVED", actor, changeMap.toMap(), requestId);
+
+		scheduleOverrideCachePut(flag.getId(), userId, saved);
+	}
+
+	private void scheduleOverrideCachePut(Long flagId, String userId, FeatureOverride override) {
+		CachedOverride cached = CachedOverride.from(override);
+		afterCommitExecutor.execute(() -> featureCacheService.putOverride(flagId, userId, cached));
 	}
 
 	private void validateUserId(String userId) {

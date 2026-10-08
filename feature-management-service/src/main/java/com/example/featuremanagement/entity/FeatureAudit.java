@@ -17,7 +17,6 @@ import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
 
 @Entity
 @Table(name = "feature_audits")
@@ -26,12 +25,12 @@ import java.util.UUID;
 public class FeatureAudit {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.UUID)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(nullable = false, updatable = false)
-	private UUID id;
+	private Long id;
 
 	@Column(name = "flag_id", nullable = false, updatable = false)
-	private UUID flagId;
+	private Long flagId;
 
 	@Column(nullable = false, updatable = false, length = 50)
 	private String action;
@@ -50,7 +49,7 @@ public class FeatureAudit {
 	private Instant createdAt;
 
 	public FeatureAudit(
-			UUID flagId,
+			Long flagId,
 			String action,
 			String actorId,
 			Map<String, Map<String, Object>> changeMap,

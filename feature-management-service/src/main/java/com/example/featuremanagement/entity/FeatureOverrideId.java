@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.UUID;
 
 @Embeddable
 @Getter
@@ -17,12 +16,12 @@ import java.util.UUID;
 public class FeatureOverrideId implements Serializable {
 
 	@Column(name = "flag_id", nullable = false)
-	private UUID flagId;
+	private Long flagId;
 
 	@Column(name = "user_id", nullable = false, length = 150)
 	private String userId;
 
-	public FeatureOverrideId(UUID flagId, String userId) {
+	public FeatureOverrideId(Long flagId, String userId) {
 		this.flagId = flagId;
 		this.userId = userId;
 	}

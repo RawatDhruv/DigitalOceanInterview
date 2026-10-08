@@ -18,7 +18,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 import java.util.Objects;
-import java.util.UUID;
 
 @Entity
 @Table(
@@ -33,9 +32,9 @@ import java.util.UUID;
 public class FeatureFlag {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.UUID)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(nullable = false, updatable = false)
-	private UUID id;
+	private Long id;
 
 	@Column(nullable = false, length = 150, updatable = false)
 	private String name;

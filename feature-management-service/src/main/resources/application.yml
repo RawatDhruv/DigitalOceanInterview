@@ -5,6 +5,12 @@ spring:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/feature_management}
     username: ${SPRING_DATASOURCE_USERNAME:fms}
     password: ${SPRING_DATASOURCE_PASSWORD:fms}
+  data:
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST:localhost}
+      port: ${SPRING_DATA_REDIS_PORT:6379}
+      timeout: ${SPRING_DATA_REDIS_TIMEOUT:200ms}
+      connect-timeout: ${SPRING_DATA_REDIS_CONNECT_TIMEOUT:200ms}
   jpa:
     hibernate:
       ddl-auto: validate
@@ -15,6 +21,12 @@ spring:
           time_zone: UTC
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
+
+app:
+  cache:
+    flag-ttl: ${APP_CACHE_FLAG_TTL:30s}
+    override-ttl: ${APP_CACHE_OVERRIDE_TTL:30s}
+    inherit-ttl: ${APP_CACHE_INHERIT_TTL:15s}
 
 management:
   endpoints:

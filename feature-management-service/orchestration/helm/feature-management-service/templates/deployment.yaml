@@ -43,6 +43,10 @@ spec:
                 secretKeyRef:
                   name: "{{ .Release.Name }}-db"
                   key: password
+            - name: SPRING_DATA_REDIS_HOST
+              value: {{ .Values.app.redis.host | quote }}
+            - name: SPRING_DATA_REDIS_PORT
+              value: {{ .Values.app.redis.port | quote }}
           livenessProbe:
             httpGet:
               path: {{ .Values.probes.liveness.path }}

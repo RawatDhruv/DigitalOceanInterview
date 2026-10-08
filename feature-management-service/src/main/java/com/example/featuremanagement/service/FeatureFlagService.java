@@ -1,5 +1,6 @@
 package com.example.featuremanagement.service;
 
+import com.example.featuremanagement.cache.CachedFlag;
 import com.example.featuremanagement.dto.CreateFlagRequest;
 import com.example.featuremanagement.dto.FeatureFlagResponse;
 import com.example.featuremanagement.dto.UpdateFlagRequest;
@@ -22,6 +23,8 @@ public class FeatureFlagService {
 
 	private final FeatureFlagRepository repository;
 	private final AuditService auditService;
+	private final FeatureCacheService featureCacheService;
+	private final AfterCommitExecutor afterCommitExecutor;
 
 	@Transactional(readOnly = true)
 	public FeatureFlag getFlagEntity(String name) {
@@ -57,7 +60,7 @@ public class FeatureFlagService {
 			flag.updateState(request.state(), actor);
 		}
 
-		FeatureFlag saved = repository.save(flag);
+		FeatureFlag saved = repository.saveAndFlush(flag);
 
 		ChangeMap changeMap = ChangeMap.create()
 				.put("name", null, saved.getName())
@@ -66,6 +69,7 @@ public class FeatureFlagService {
 				.put("state", null, initialState.name());
 
 		auditService.record(saved.getId(), "FLAG_CREATED", actor, changeMap.toMap(), requestId);
+		scheduleFlagCachePut(saved);
 		return FeatureFlagResponse.from(saved);
 	}
 
@@ -87,10 +91,11 @@ public class FeatureFlagService {
 			flag.updateState(request.state(), actor);
 		}
 
-		FeatureFlag saved = repository.save(flag);
+		FeatureFlag saved = repository.saveAndFlush(flag);
 		if (!changeMap.isEmpty()) {
 			auditService.record(saved.getId(), "FLAG_UPDATED", actor, changeMap.toMap(), requestId);
 		}
+		scheduleFlagCachePut(saved);
 		return FeatureFlagResponse.from(saved);
 	}
 
@@ -106,5 +111,11 @@ public class FeatureFlagService {
 
 		auditService.record(flag.getId(), "FLAG_DELETED", actor, changeMap.toMap(), requestId);
 		repository.delete(flag);
+		afterCommitExecutor.execute(() -> featureCacheService.evictFlag(name));
+	}
+
+	private void scheduleFlagCachePut(FeatureFlag flag) {
+		CachedFlag cached = CachedFlag.from(flag);
+		afterCommitExecutor.execute(() -> featureCacheService.putFlag(cached));
 	}
 }

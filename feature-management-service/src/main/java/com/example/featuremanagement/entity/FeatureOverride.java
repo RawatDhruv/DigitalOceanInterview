@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 import java.util.Objects;
-import java.util.UUID;
 
 @Entity
 @Table(name = "feature_overrides")
@@ -35,7 +34,7 @@ public class FeatureOverride {
 	@Column(name = "updated_at", nullable = false)
 	private Instant updatedAt;
 
-	public FeatureOverride(UUID flagId, String userId, Boolean enabled, String actor) {
+	public FeatureOverride(Long flagId, String userId, Boolean enabled, String actor) {
 		this.id = new FeatureOverrideId(flagId, Objects.requireNonNull(userId));
 		this.enabled = enabled;
 		this.updatedBy = Objects.requireNonNull(actor);
@@ -47,7 +46,7 @@ public class FeatureOverride {
 		updatedAt = Instant.now();
 	}
 
-	public UUID getFlagId() {
+	public Long getFlagId() {
 		return id.getFlagId();
 	}
 

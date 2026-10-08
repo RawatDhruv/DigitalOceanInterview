@@ -4,11 +4,10 @@ import com.example.featuremanagement.entity.FeatureAudit;
 
 import java.time.Instant;
 import java.util.Map;
-import java.util.UUID;
 
 public record FeatureAuditResponse(
-		UUID id,
-		UUID flagId,
+		Long id,
+		Long flagId,
 		String action,
 		String actorId,
 		Map<String, Map<String, Object>> changeMap,

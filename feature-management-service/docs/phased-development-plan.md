@@ -59,7 +59,7 @@ src/main/resources/
 
 | Column           | Type              |
 | ---------------- | ----------------- |
-| `id`             | UUID, primary key |
+| `id`             | BIGINT, primary key (identity / auto-increment) |
 | `name`           | VARCHAR(150)      |
 | `description`    | TEXT              |
 | `global_enabled` | BOOLEAN           |
@@ -69,9 +69,9 @@ src/main/resources/
 | `updated_at`     | TIMESTAMPTZ       |
 
 
-Add a unique constraint on `name`.
+Add a unique constraint on `name`. Surrogate `id` is a database-generated `BIGINT` (JPA `GenerationType.IDENTITY`), not a UUID.
 
-> V1 deliberately omits `project_id`, `environment`, lifecycle `state`, and optimistic-lock `version`. Flags are globally unique by name; enablement is controlled only by `global_enabled` and per-user overrides.
+> V1 deliberately omits `project_id` and `environment`. Flags are globally unique by name; enablement is controlled by `global_enabled` and per-user overrides. Later local migrations may add optional `state` / `version` columns for admin workflows; they are not part of the evaluation contract.
 
 ### Completion criteria
 
@@ -159,16 +159,16 @@ All five APIs work against PostgreSQL and have service-level tests.
 `004-create-feature-overrides.yaml`
 
 
-| Column       | Type              |
-| ------------ | ----------------- |
-| `flag_id`    | UUID, foreign key |
-| `user_id`    | VARCHAR(150)      |
-| `enabled`    | BOOLEAN, nullable |
-| `updated_by` | VARCHAR(100)      |
-| `updated_at` | TIMESTAMPTZ       |
+| Column       | Type                                      |
+| ------------ | ----------------------------------------- |
+| `flag_id`    | BIGINT, foreign key → `feature_flags.id`  |
+| `user_id`    | VARCHAR(150)                              |
+| `enabled`    | BOOLEAN, nullable                         |
+| `updated_by` | VARCHAR(100)                              |
+| `updated_at` | TIMESTAMPTZ                               |
 
 
-Primary key: `(flag_id, user_id)`.
+Primary key: `(flag_id, user_id)`. Flag surrogate keys are `BIGINT` identity values (not UUIDs).
 
 Use `NULL` as an optional tombstone meaning the override was removed (inherit global). `updated_at` is used for cache freshness when Redis is introduced.
 
@@ -263,9 +263,19 @@ At the end of Phase 5, the core feature flag system is functional. You can demon
 
 `005-create-feature-audits.yaml`
 
-Columns: `id`, `flag_id`, `action`, `actor_id`, `change_map`, `request_id`, `created_at`.
 
-Use PostgreSQL `JSONB` for `change_map`.
+| Column       | Type                         |
+| ------------ | ---------------------------- |
+| `id`         | BIGINT, primary key (identity) |
+| `flag_id`    | BIGINT (references flag; no FK so history survives flag delete) |
+| `action`     | VARCHAR(50)                  |
+| `actor_id`   | VARCHAR(100)                 |
+| `change_map` | JSONB                        |
+| `request_id` | VARCHAR(100), nullable       |
+| `created_at` | TIMESTAMPTZ                  |
+
+
+Index: `(flag_id, created_at DESC)`. Use PostgreSQL `JSONB` for `change_map` (H2 tests use `JSON`).
 
 ### Example audit event
 
@@ -304,7 +314,7 @@ Every committed mutation has an audit record. There is no optimistic-lock `versi
 ### Implementation tasks
 
 1. Add Spring Data Redis.
-2. Run Redis locally using Docker Compose.
+2. Run Redis locally with Homebrew (`brew install redis` + `scripts/start-local-redis.sh`); Docker Compose Redis remains optional.
 3. Create `FeatureCacheService` using `StringRedisTemplate` or Redis hash operations.
 4. Cache global flag metadata.
 5. Cache explicit user overrides.
@@ -319,7 +329,7 @@ ff:flag:{name}
 ff:override:{flagId}:{userId}
 ```
 
-Store `updatedAt` (or equivalent) with cache entries so later synchronization can reject outdated updates.
+`flagId` in override keys is the numeric `BIGINT` surrogate key (for example `ff:override:42:user-123`). Store `updatedAt` (or equivalent) with cache entries so later synchronization can reject outdated updates.
 
 ### Completion criteria
 
@@ -440,7 +450,7 @@ Failure scenarios produce predictable results and do not corrupt flag or audit d
 
 `README.md` must cover:
 
-1. **Setup** — Java 21, Docker Compose for PostgreSQL/Redis, how to run the app, health endpoint.
+1. **Setup** — Java 21, Homebrew or Docker Compose for PostgreSQL/Redis (`scripts/start-local-*.sh`), how to run the app, health endpoint.
 2. **Flag evaluation rules** — override precedence (`USER_OVERRIDE` > `GLOBAL`), example `reason` codes.
 3. **How caching is implemented** — key layout, TTLs, read-through, outbox invalidation/update, Redis-down fallback.
 4. Link to the HLD evaluation-path architecture diagram (cache consult / bypass / invalidate).
@@ -504,9 +514,11 @@ feature-management-service/
 │   │           ├── db.changelog-master.yaml
 │   │           └── changes/
 │   │               ├── 001-create-feature-flags.yaml
-│   │               ├── 002-create-feature-overrides.yaml
+│   │               ├── 002-alter-feature-flags-description.yaml
+│   │               ├── 003-add-feature-flags-state-and-version.yaml
+│   │               ├── 004-create-feature-overrides.yaml
 │   │               ├── 005-create-feature-audits.yaml
-│   │               └── 004-create-outbox-events.yaml
+│   │               └── 006-create-outbox-events.yaml   # Phase 8
 │   └── test/
 ├── orchestration/
 │   └── helm/

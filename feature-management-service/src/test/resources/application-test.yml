@@ -4,6 +4,12 @@ spring:
     username: sa
     password:
     driver-class-name: org.h2.Driver
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 100ms
+      connect-timeout: 100ms
   jpa:
     hibernate:
       ddl-auto: validate
@@ -12,3 +18,14 @@ spring:
         dialect: org.hibernate.dialect.H2Dialect
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
+
+app:
+  cache:
+    flag-ttl: 30s
+    override-ttl: 30s
+    inherit-ttl: 15s
+
+management:
+  health:
+    redis:
+      enabled: false

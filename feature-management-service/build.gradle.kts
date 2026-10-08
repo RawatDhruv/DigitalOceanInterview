@@ -24,6 +24,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
 	implementation("org.springframework.boot:spring-boot-starter-liquibase")
+	implementation("org.springframework.boot:spring-boot-starter-data-redis")
 	runtimeOnly("org.postgresql:postgresql")
 
 	// Lombok (Gradle equivalent of Maven optional=true)

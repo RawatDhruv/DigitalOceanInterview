@@ -37,6 +37,9 @@ app:
     url: ""
     username: ""
     password: ""
+  redis:
+    host: ""
+    port: 6379
 
 # Optional: set to create an Ingress
 ingress:

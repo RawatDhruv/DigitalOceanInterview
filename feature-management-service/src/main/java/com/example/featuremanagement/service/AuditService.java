@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -19,7 +18,7 @@ public class AuditService {
 
 	@Transactional
 	public void record(
-			UUID flagId,
+			Long flagId,
 			String action,
 			String actorId,
 			Map<String, Map<String, Object>> changeMap,

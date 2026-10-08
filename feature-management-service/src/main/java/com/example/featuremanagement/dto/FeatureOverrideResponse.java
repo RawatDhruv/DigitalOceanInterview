@@ -3,10 +3,9 @@ package com.example.featuremanagement.dto;
 import com.example.featuremanagement.entity.FeatureOverride;
 
 import java.time.Instant;
-import java.util.UUID;
 
 public record FeatureOverrideResponse(
-		UUID flagId,
+		Long flagId,
 		String flagName,
 		String userId,
 		Boolean enabled,
