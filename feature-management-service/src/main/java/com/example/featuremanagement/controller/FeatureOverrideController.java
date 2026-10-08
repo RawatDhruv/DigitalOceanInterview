@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class FeatureOverrideController {
 
 	private static final String ACTOR_HEADER = "X-Actor-Id";
+	private static final String REQUEST_ID_HEADER = "X-Request-Id";
 	private static final String DEFAULT_ACTOR = "local-admin";
 
 	private final FeatureOverrideService featureOverrideService;
@@ -43,8 +44,10 @@ public class FeatureOverrideController {
 			@Size(min = 1, max = 150)
 			String userId,
 			@Valid @RequestBody UpsertOverrideRequest request,
-			@RequestHeader(value = ACTOR_HEADER, defaultValue = DEFAULT_ACTOR) String actor) {
-		return featureOverrideService.upsertOverride(name, userId, request, actor);
+			@RequestHeader(value = ACTOR_HEADER, defaultValue = DEFAULT_ACTOR) String actor,
+			@RequestHeader(value = REQUEST_ID_HEADER, required = false) String requestId) {
+		return featureOverrideService.upsertOverride(
+				name, userId, request, actor, RequestIds.resolve(requestId));
 	}
 
 	@GetMapping
@@ -66,8 +69,9 @@ public class FeatureOverrideController {
 			@PathVariable
 			@Size(min = 1, max = 150)
 			String userId,
-			@RequestHeader(value = ACTOR_HEADER, defaultValue = DEFAULT_ACTOR) String actor) {
-		featureOverrideService.removeOverride(name, userId, actor);
+			@RequestHeader(value = ACTOR_HEADER, defaultValue = DEFAULT_ACTOR) String actor,
+			@RequestHeader(value = REQUEST_ID_HEADER, required = false) String requestId) {
+		featureOverrideService.removeOverride(name, userId, actor, RequestIds.resolve(requestId));
 		return ResponseEntity.noContent().build();
 	}
 }

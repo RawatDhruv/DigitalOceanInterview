@@ -1,0 +1,104 @@
+databaseChangeLog:
+  - changeSet:
+      id: 005-create-feature-audits-postgresql
+      author: feature-management-service
+      dbms: postgresql
+      changes:
+        - createTable:
+            tableName: feature_audits
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: flag_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: action
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: actor_id
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: change_map
+                  type: JSONB
+                  constraints:
+                    nullable: false
+              - column:
+                  name: request_id
+                  type: VARCHAR(100)
+              - column:
+                  name: created_at
+                  type: TIMESTAMPTZ
+                  constraints:
+                    nullable: false
+        - createIndex:
+            tableName: feature_audits
+            indexName: idx_feature_audits_flag_created
+            columns:
+              - column:
+                  name: flag_id
+              - column:
+                  name: created_at
+                  descending: true
+
+  - changeSet:
+      id: 005-create-feature-audits-h2
+      author: feature-management-service
+      dbms: h2
+      changes:
+        - createTable:
+            tableName: feature_audits
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: flag_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: action
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: actor_id
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: change_map
+                  type: JSON
+                  constraints:
+                    nullable: false
+              - column:
+                  name: request_id
+                  type: VARCHAR(100)
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  constraints:
+                    nullable: false
+        - createIndex:
+            tableName: feature_audits
+            indexName: idx_feature_audits_flag_created
+            columns:
+              - column:
+                  name: flag_id
+              - column:
+                  name: created_at
+                  descending: true

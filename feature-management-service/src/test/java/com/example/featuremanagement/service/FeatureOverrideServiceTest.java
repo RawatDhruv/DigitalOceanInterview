@@ -13,8 +13,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -50,12 +52,13 @@ class FeatureOverrideServiceTest {
 				"new-checkout",
 				"user-1",
 				new UpsertOverrideRequest(false),
-				"admin-1"
+				"admin-1",
+				"req-1"
 		);
 
 		assertThat(response.enabled()).isFalse();
 		assertThat(response.userId()).isEqualTo("user-1");
-		verify(auditService).record("OVERRIDE_UPSERTED", "new-checkout", "admin-1");
+		verify(auditService).record(eq(flag.getId()), eq("OVERRIDE_UPSERTED"), eq("admin-1"), any(Map.class), eq("req-1"));
 	}
 
 	@Test
@@ -66,11 +69,11 @@ class FeatureOverrideServiceTest {
 		when(overrideRepository.findByIdFlagIdAndIdUserId(flag.getId(), "user-1")).thenReturn(Optional.of(existing));
 		when(overrideRepository.save(any(FeatureOverride.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-		featureOverrideService.removeOverride("new-checkout", "user-1", "admin-2");
+		featureOverrideService.removeOverride("new-checkout", "user-1", "admin-2", "req-2");
 
 		assertThat(existing.getEnabled()).isNull();
 		assertThat(existing.getUpdatedBy()).isEqualTo("admin-2");
-		verify(auditService).record("OVERRIDE_REMOVED", "new-checkout", "admin-2");
+		verify(auditService).record(eq(flag.getId()), eq("OVERRIDE_REMOVED"), eq("admin-2"), any(Map.class), eq("req-2"));
 	}
 
 	@Test
@@ -92,17 +95,7 @@ class FeatureOverrideServiceTest {
 
 	private FeatureFlag stubFlag() {
 		FeatureFlag flag = new FeatureFlag("new-checkout", "Checkout", true, "admin-1");
-		// id is generated on persist; set via reflection-free approach by saving mock id through subclassing is hard.
-		// Use repository-style: FeatureFlag id is null until persist — override service only needs getId().
-		// Assign using a test helper via package — instead mock getId by creating with reflection.
-		try {
-			var field = FeatureFlag.class.getDeclaredField("id");
-			field.setAccessible(true);
-			field.set(flag, UUID.fromString("11111111-1111-1111-1111-111111111111"));
-		}
-		catch (ReflectiveOperationException e) {
-			throw new IllegalStateException(e);
-		}
+		ReflectionTestUtils.setField(flag, "id", UUID.fromString("11111111-1111-1111-1111-111111111111"));
 		return flag;
 	}
 }

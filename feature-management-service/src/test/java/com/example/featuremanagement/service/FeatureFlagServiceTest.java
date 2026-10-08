@@ -17,13 +17,17 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -61,16 +65,21 @@ class FeatureFlagServiceTest {
 	@Test
 	void createFlagPersistsAndAudits() {
 		when(repository.existsByName("dark-mode")).thenReturn(false);
-		when(repository.save(any(FeatureFlag.class))).thenAnswer(invocation -> invocation.getArgument(0));
+		when(repository.save(any(FeatureFlag.class))).thenAnswer(invocation -> {
+			FeatureFlag flag = invocation.getArgument(0);
+			ReflectionTestUtils.setField(flag, "id", UUID.randomUUID());
+			return flag;
+		});
 
 		FeatureFlagResponse created = featureFlagService.createFlag(
 				new CreateFlagRequest("dark-mode", "Theme", false, FlagState.ACTIVE),
-				"admin-1"
+				"admin-1",
+				"req-1"
 		);
 
 		assertThat(created.name()).isEqualTo("dark-mode");
 		assertThat(created.state()).isEqualTo(FlagState.ACTIVE);
-		verify(auditService).record("FLAG_CREATED", "dark-mode", "admin-1");
+		verify(auditService).record(any(UUID.class), eq("FLAG_CREATED"), eq("admin-1"), any(Map.class), eq("req-1"));
 	}
 
 	@Test
@@ -79,27 +88,30 @@ class FeatureFlagServiceTest {
 
 		assertThatThrownBy(() -> featureFlagService.createFlag(
 				new CreateFlagRequest("dark-mode", null, true, null),
-				"admin-1"
+				"admin-1",
+				"req-1"
 		)).isInstanceOf(DuplicateFeatureException.class);
 	}
 
 	@Test
 	void updateFlagAppliesPartialChanges() {
 		FeatureFlag flag = new FeatureFlag("dark-mode", "Old", false, "admin-1");
+		ReflectionTestUtils.setField(flag, "id", UUID.randomUUID());
 		when(repository.findByName("dark-mode")).thenReturn(Optional.of(flag));
 		when(repository.save(any(FeatureFlag.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
 		FeatureFlagResponse updated = featureFlagService.updateFlag(
 				"dark-mode",
 				new UpdateFlagRequest("New", true, FlagState.ACTIVE),
-				"admin-2"
+				"admin-2",
+				"req-2"
 		);
 
 		assertThat(updated.description()).isEqualTo("New");
 		assertThat(updated.globalEnabled()).isTrue();
 		assertThat(updated.state()).isEqualTo(FlagState.ACTIVE);
 		assertThat(updated.updatedBy()).isEqualTo("admin-2");
-		verify(auditService).record("FLAG_UPDATED", "dark-mode", "admin-2");
+		verify(auditService).record(any(UUID.class), eq("FLAG_UPDATED"), eq("admin-2"), any(Map.class), eq("req-2"));
 	}
 
 	@Test
@@ -117,13 +129,14 @@ class FeatureFlagServiceTest {
 	@Test
 	void deleteFlagRemovesEntity() {
 		FeatureFlag flag = new FeatureFlag("to-delete", null, true, "admin-1");
+		ReflectionTestUtils.setField(flag, "id", UUID.randomUUID());
 		when(repository.findByName("to-delete")).thenReturn(Optional.of(flag));
 
-		featureFlagService.deleteFlag("to-delete", "admin-1");
+		featureFlagService.deleteFlag("to-delete", "admin-1", "req-3");
 
 		ArgumentCaptor<FeatureFlag> captor = ArgumentCaptor.forClass(FeatureFlag.class);
 		verify(repository).delete(captor.capture());
 		assertThat(captor.getValue().getName()).isEqualTo("to-delete");
-		verify(auditService).record("FLAG_DELETED", "to-delete", "admin-1");
+		verify(auditService).record(any(UUID.class), eq("FLAG_DELETED"), eq("admin-1"), any(Map.class), eq("req-3"));
 	}
 }

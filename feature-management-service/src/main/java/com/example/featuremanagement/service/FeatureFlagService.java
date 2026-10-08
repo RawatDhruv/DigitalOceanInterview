@@ -4,6 +4,7 @@ import com.example.featuremanagement.dto.CreateFlagRequest;
 import com.example.featuremanagement.dto.FeatureFlagResponse;
 import com.example.featuremanagement.dto.UpdateFlagRequest;
 import com.example.featuremanagement.entity.FeatureFlag;
+import com.example.featuremanagement.entity.FlagState;
 import com.example.featuremanagement.exception.DuplicateFeatureException;
 import com.example.featuremanagement.exception.FeatureNotFoundException;
 import com.example.featuremanagement.repository.FeatureFlagRepository;
@@ -40,7 +41,7 @@ public class FeatureFlagService {
 	}
 
 	@Transactional
-	public FeatureFlagResponse createFlag(CreateFlagRequest request, String actor) {
+	public FeatureFlagResponse createFlag(CreateFlagRequest request, String actor, String requestId) {
 		if (repository.existsByName(request.name())) {
 			throw new DuplicateFeatureException(request.name());
 		}
@@ -51,38 +52,59 @@ public class FeatureFlagService {
 				request.globalEnabled(),
 				actor
 		);
+		FlagState initialState = request.state() != null ? request.state() : FlagState.DRAFT;
 		if (request.state() != null) {
 			flag.updateState(request.state(), actor);
 		}
 
 		FeatureFlag saved = repository.save(flag);
-		auditService.record("FLAG_CREATED", saved.getName(), actor);
+
+		ChangeMap changeMap = ChangeMap.create()
+				.put("name", null, saved.getName())
+				.put("description", null, saved.getDescription())
+				.put("globalEnabled", null, saved.isGlobalEnabled())
+				.put("state", null, initialState.name());
+
+		auditService.record(saved.getId(), "FLAG_CREATED", actor, changeMap.toMap(), requestId);
 		return FeatureFlagResponse.from(saved);
 	}
 
 	@Transactional
-	public FeatureFlagResponse updateFlag(String name, UpdateFlagRequest request, String actor) {
+	public FeatureFlagResponse updateFlag(String name, UpdateFlagRequest request, String actor, String requestId) {
 		FeatureFlag flag = getFlagEntity(name);
 
+		ChangeMap changeMap = ChangeMap.create();
 		if (request.description() != null) {
+			changeMap.put("description", flag.getDescription(), request.description());
 			flag.updateDescription(request.description(), actor);
 		}
 		if (request.globalEnabled() != null) {
+			changeMap.put("globalEnabled", flag.isGlobalEnabled(), request.globalEnabled());
 			flag.updateGlobalEnabled(request.globalEnabled(), actor);
 		}
 		if (request.state() != null) {
+			changeMap.put("state", flag.getState().name(), request.state().name());
 			flag.updateState(request.state(), actor);
 		}
 
 		FeatureFlag saved = repository.save(flag);
-		auditService.record("FLAG_UPDATED", saved.getName(), actor);
+		if (!changeMap.isEmpty()) {
+			auditService.record(saved.getId(), "FLAG_UPDATED", actor, changeMap.toMap(), requestId);
+		}
 		return FeatureFlagResponse.from(saved);
 	}
 
 	@Transactional
-	public void deleteFlag(String name, String actor) {
+	public void deleteFlag(String name, String actor, String requestId) {
 		FeatureFlag flag = getFlagEntity(name);
+
+		ChangeMap changeMap = ChangeMap.create()
+				.put("name", flag.getName(), null)
+				.put("description", flag.getDescription(), null)
+				.put("globalEnabled", flag.isGlobalEnabled(), null)
+				.put("state", flag.getState().name(), null);
+
+		auditService.record(flag.getId(), "FLAG_DELETED", actor, changeMap.toMap(), requestId);
 		repository.delete(flag);
-		auditService.record("FLAG_DELETED", name, actor);
 	}
 }

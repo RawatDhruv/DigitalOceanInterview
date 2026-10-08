@@ -102,6 +102,53 @@ class FeatureApiIntegrationTest {
 		HttpResponse<String> listAfterRemove = send("GET", "/api/v1/flags/new-checkout/overrides", null);
 		assertThat(objectMapper.readTree(listAfterRemove.body()).get("content")).isEmpty();
 
+		HttpResponse<String> evaluateGlobal = send(
+				"GET",
+				"/api/v1/evaluations/new-checkout?userId=user-123",
+				null
+		);
+		assertThat(evaluateGlobal.statusCode()).isEqualTo(200);
+		JsonNode evaluated = objectMapper.readTree(evaluateGlobal.body());
+		assertThat(evaluated.get("enabled").asBoolean()).isTrue();
+		assertThat(evaluated.get("reason").asText()).isEqualTo("GLOBAL");
+
+		HttpResponse<String> putOverrideAgain = send(
+				"PUT",
+				"/api/v1/flags/new-checkout/overrides/user-123",
+				"""
+						{"enabled":false}
+						"""
+		);
+		assertThat(putOverrideAgain.statusCode()).isEqualTo(200);
+
+		HttpResponse<String> evaluateOverride = send(
+				"GET",
+				"/api/v1/evaluations/new-checkout?userId=user-123",
+				null
+		);
+		assertThat(evaluateOverride.statusCode()).isEqualTo(200);
+		JsonNode overrideEval = objectMapper.readTree(evaluateOverride.body());
+		assertThat(overrideEval.get("enabled").asBoolean()).isFalse();
+		assertThat(overrideEval.get("reason").asText()).isEqualTo("USER_OVERRIDE");
+
+		HttpResponse<String> audits = send("GET", "/api/v1/flags/new-checkout/audits", null);
+		assertThat(audits.statusCode()).isEqualTo(200);
+		assertThat(objectMapper.readTree(audits.body()).get("content")).isNotEmpty();
+
+		HttpResponse<String> invalidEvalName = send(
+				"GET",
+				"/api/v1/evaluations/Bad%20Name?userId=user-123",
+				null
+		);
+		assertThat(invalidEvalName.statusCode()).isEqualTo(400);
+
+		HttpResponse<String> missingEval = send(
+				"GET",
+				"/api/v1/evaluations/does-not-exist?userId=user-123",
+				null
+		);
+		assertThat(missingEval.statusCode()).isEqualTo(404);
+
 		HttpResponse<String> missing = send("GET", "/api/v1/flags/does-not-exist", null);
 		assertThat(missing.statusCode()).isEqualTo(404);
 

@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class FeatureFlagController {
 
 	private static final String ACTOR_HEADER = "X-Actor-Id";
+	private static final String REQUEST_ID_HEADER = "X-Request-Id";
 	private static final String DEFAULT_ACTOR = "local-admin";
 
 	private final FeatureFlagService featureFlagService;
@@ -39,8 +40,10 @@ public class FeatureFlagController {
 	@PostMapping
 	public ResponseEntity<FeatureFlagResponse> create(
 			@Valid @RequestBody CreateFlagRequest request,
-			@RequestHeader(value = ACTOR_HEADER, defaultValue = DEFAULT_ACTOR) String actor) {
-		return ResponseEntity.status(HttpStatus.CREATED).body(featureFlagService.createFlag(request, actor));
+			@RequestHeader(value = ACTOR_HEADER, defaultValue = DEFAULT_ACTOR) String actor,
+			@RequestHeader(value = REQUEST_ID_HEADER, required = false) String requestId) {
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(featureFlagService.createFlag(request, actor, RequestIds.resolve(requestId)));
 	}
 
 	@GetMapping
@@ -65,8 +68,9 @@ public class FeatureFlagController {
 			@Pattern(regexp = "^[a-z0-9]+(?:[_-][a-z0-9]+)*$")
 			String name,
 			@Valid @RequestBody UpdateFlagRequest request,
-			@RequestHeader(value = ACTOR_HEADER, defaultValue = DEFAULT_ACTOR) String actor) {
-		return featureFlagService.updateFlag(name, request, actor);
+			@RequestHeader(value = ACTOR_HEADER, defaultValue = DEFAULT_ACTOR) String actor,
+			@RequestHeader(value = REQUEST_ID_HEADER, required = false) String requestId) {
+		return featureFlagService.updateFlag(name, request, actor, RequestIds.resolve(requestId));
 	}
 
 	@DeleteMapping("/{name}")
@@ -75,8 +79,9 @@ public class FeatureFlagController {
 			@Size(min = 1, max = 150)
 			@Pattern(regexp = "^[a-z0-9]+(?:[_-][a-z0-9]+)*$")
 			String name,
-			@RequestHeader(value = ACTOR_HEADER, defaultValue = DEFAULT_ACTOR) String actor) {
-		featureFlagService.deleteFlag(name, actor);
+			@RequestHeader(value = ACTOR_HEADER, defaultValue = DEFAULT_ACTOR) String actor,
+			@RequestHeader(value = REQUEST_ID_HEADER, required = false) String requestId) {
+		featureFlagService.deleteFlag(name, actor, RequestIds.resolve(requestId));
 		return ResponseEntity.noContent().build();
 	}
 }

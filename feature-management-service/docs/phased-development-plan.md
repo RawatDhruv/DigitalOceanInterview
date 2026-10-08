@@ -261,7 +261,7 @@ At the end of Phase 5, the core feature flag system is functional. You can demon
 
 ### Database migration
 
-`003-create-feature-audit.yaml`
+`005-create-feature-audits.yaml`
 
 Columns: `id`, `flag_id`, `action`, `actor_id`, `change_map`, `request_id`, `created_at`.
 
@@ -505,7 +505,7 @@ feature-management-service/
 │   │           └── changes/
 │   │               ├── 001-create-feature-flags.yaml
 │   │               ├── 002-create-feature-overrides.yaml
-│   │               ├── 003-create-feature-audit.yaml
+│   │               ├── 005-create-feature-audits.yaml
 │   │               └── 004-create-outbox-events.yaml
 │   └── test/
 ├── orchestration/

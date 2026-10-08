@@ -26,17 +26,23 @@ public class FeatureOverrideService {
 			String flagName,
 			String userId,
 			UpsertOverrideRequest request,
-			String actor) {
+			String actor,
+			String requestId) {
 		validateUserId(userId);
 		FeatureFlag flag = featureFlagService.getFlagEntity(flagName);
 
-		FeatureOverride override = overrideRepository
-				.findByIdFlagIdAndIdUserId(flag.getId(), userId)
-				.orElseGet(() -> new FeatureOverride(flag.getId(), userId, request.enabled(), actor));
-
+		var existing = overrideRepository.findByIdFlagIdAndIdUserId(flag.getId(), userId);
+		Boolean previous = existing.map(FeatureOverride::getEnabled).orElse(null);
+		FeatureOverride override = existing.orElseGet(
+				() -> new FeatureOverride(flag.getId(), userId, null, actor));
 		override.upsertEnabled(request.enabled(), actor);
 		FeatureOverride saved = overrideRepository.save(override);
-		auditService.record("OVERRIDE_UPSERTED", flagName, actor);
+
+		ChangeMap changeMap = ChangeMap.create()
+				.put("userId", null, userId)
+				.put("enabled", previous, saved.getEnabled());
+		auditService.record(flag.getId(), "OVERRIDE_UPSERTED", actor, changeMap.toMap(), requestId);
+
 		return FeatureOverrideResponse.from(saved, flagName);
 	}
 
@@ -48,7 +54,7 @@ public class FeatureOverrideService {
 	}
 
 	@Transactional
-	public void removeOverride(String flagName, String userId, String actor) {
+	public void removeOverride(String flagName, String userId, String actor, String requestId) {
 		validateUserId(userId);
 		FeatureFlag flag = featureFlagService.getFlagEntity(flagName);
 
@@ -56,9 +62,14 @@ public class FeatureOverrideService {
 				.findByIdFlagIdAndIdUserId(flag.getId(), userId)
 				.orElseGet(() -> new FeatureOverride(flag.getId(), userId, null, actor));
 
+		Boolean previous = override.getEnabled();
 		override.markRemoved(actor);
 		overrideRepository.save(override);
-		auditService.record("OVERRIDE_REMOVED", flagName, actor);
+
+		ChangeMap changeMap = ChangeMap.create()
+				.put("userId", null, userId)
+				.put("enabled", previous, null);
+		auditService.record(flag.getId(), "OVERRIDE_REMOVED", actor, changeMap.toMap(), requestId);
 	}
 
 	private void validateUserId(String userId) {
