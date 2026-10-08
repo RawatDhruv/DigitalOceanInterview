@@ -31,20 +31,27 @@ public class DbFallbackGuard {
 
 	public <T> T execute(Supplier<T> databaseCall) {
 		if (isOpen()) {
+			log.debug("DB fallback rejected; circuit open untilEpochMs={}", openUntilEpochMs);
 			throw new EvaluationUnavailableException(
 					"Evaluation unavailable: database fallback circuit is open");
 		}
 		if (!permits.tryAcquire()) {
+			log.debug(
+					"DB fallback rejected; concurrent capacity exceeded max={}",
+					properties.dbFallbackMaxConcurrent()
+			);
 			throw new EvaluationUnavailableException(
 					"Evaluation unavailable: database fallback capacity exceeded");
 		}
 		try {
+			log.debug("DB fallback acquired; availablePermits={}", permits.availablePermits());
 			T result = databaseCall.get();
 			consecutiveFailures.set(0);
 			return result;
 		}
 		catch (DataAccessException ex) {
 			onFailure();
+			log.debug("DB fallback data-access failure consecutiveFailures will reopen circuit if threshold met");
 			throw new EvaluationUnavailableException("Evaluation unavailable: database error", ex);
 		}
 		catch (RuntimeException ex) {

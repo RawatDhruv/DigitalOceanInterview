@@ -524,7 +524,8 @@ feature-management-service/
 │   │               ├── 003-add-feature-flags-state-and-version.yaml
 │   │               ├── 004-create-feature-overrides.yaml
 │   │               ├── 005-create-feature-audits.yaml
-│   │               └── 006-create-outbox-events.yaml   # Phase 8
+│   │               ├── 006-seed-demo-feature-data.yaml
+│   │               └── 007-create-outbox-events.yaml   # Phase 8 (deferred)
 │   └── test/
 ├── orchestration/
 │   └── helm/

@@ -36,6 +36,15 @@ public class FeatureOverrideService {
 
 		var existing = overrideRepository.findByIdFlagIdAndIdUserId(flag.getId(), userId);
 		Boolean previous = existing.map(FeatureOverride::getEnabled).orElse(null);
+		log.debug(
+				"Upsert override flag={} flagId={} userId={} previousEnabled={} newEnabled={} actor={}",
+				flagName,
+				flag.getId(),
+				userId,
+				previous,
+				request.enabled(),
+				actor
+		);
 		FeatureOverride override = existing.orElseGet(
 				() -> new FeatureOverride(flag.getId(), userId, null, actor));
 		override.upsertEnabled(request.enabled(), actor);
@@ -67,6 +76,14 @@ public class FeatureOverrideService {
 				.orElseGet(() -> new FeatureOverride(flag.getId(), userId, null, actor));
 
 		Boolean previous = override.getEnabled();
+		log.debug(
+				"Remove override flag={} flagId={} userId={} previousEnabled={} actor={}",
+				flagName,
+				flag.getId(),
+				userId,
+				previous,
+				actor
+		);
 		override.markRemoved(actor);
 		FeatureOverride saved = overrideRepository.saveAndFlush(override);
 
@@ -80,7 +97,15 @@ public class FeatureOverrideService {
 
 	private void scheduleOverrideCachePut(Long flagId, String userId, FeatureOverride override) {
 		CachedOverride cached = CachedOverride.from(override);
-		afterCommitExecutor.execute(() -> featureCacheService.putOverride(flagId, userId, cached));
+		afterCommitExecutor.execute(() -> {
+			log.debug(
+					"After-commit cache put override flagId={} userId={} value={}",
+					flagId,
+					userId,
+					cached.value()
+			);
+			featureCacheService.putOverride(flagId, userId, cached);
+		});
 	}
 
 	private void validateUserId(String userId) {

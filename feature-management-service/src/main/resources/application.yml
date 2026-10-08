@@ -1,3 +1,7 @@
+logging:
+  level:
+    com.example.featuremanagement.service: DEBUG
+
 spring:
   application:
     name: feature-management-service

@@ -1,0 +1,121 @@
+databaseChangeLog:
+  - changeSet:
+      id: 006-seed-demo-feature-flags
+      author: feature-management-service
+      comment: Seed five demo flags for local/dev evaluation and override demos
+      preConditions:
+        - onFail: MARK_RAN
+        - sqlCheck:
+            expectedResult: 0
+            sql: SELECT COUNT(*) FROM feature_flags WHERE name = 'beta-dashboard'
+      changes:
+        - insert:
+            tableName: feature_flags
+            columns:
+              - column: { name: name, value: beta-dashboard }
+              - column: { name: description, value: "Beta dashboard experience" }
+              - column: { name: global_enabled, valueBoolean: true }
+              - column: { name: state, value: ACTIVE }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: created_by, value: seed }
+              - column: { name: created_at, valueComputed: CURRENT_TIMESTAMP }
+              - column: { name: updated_by, value: seed }
+              - column: { name: updated_at, valueComputed: CURRENT_TIMESTAMP }
+        - insert:
+            tableName: feature_flags
+            columns:
+              - column: { name: name, value: new-billing }
+              - column: { name: description, value: "New billing checkout flow" }
+              - column: { name: global_enabled, valueBoolean: false }
+              - column: { name: state, value: ACTIVE }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: created_by, value: seed }
+              - column: { name: created_at, valueComputed: CURRENT_TIMESTAMP }
+              - column: { name: updated_by, value: seed }
+              - column: { name: updated_at, valueComputed: CURRENT_TIMESTAMP }
+        - insert:
+            tableName: feature_flags
+            columns:
+              - column: { name: name, value: ai-assistant }
+              - column: { name: description, value: "In-product AI assistant" }
+              - column: { name: global_enabled, valueBoolean: true }
+              - column: { name: state, value: ACTIVE }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: created_by, value: seed }
+              - column: { name: created_at, valueComputed: CURRENT_TIMESTAMP }
+              - column: { name: updated_by, value: seed }
+              - column: { name: updated_at, valueComputed: CURRENT_TIMESTAMP }
+        - insert:
+            tableName: feature_flags
+            columns:
+              - column: { name: name, value: mobile-push }
+              - column: { name: description, value: "Mobile push notifications" }
+              - column: { name: global_enabled, valueBoolean: false }
+              - column: { name: state, value: DRAFT }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: created_by, value: seed }
+              - column: { name: created_at, valueComputed: CURRENT_TIMESTAMP }
+              - column: { name: updated_by, value: seed }
+              - column: { name: updated_at, valueComputed: CURRENT_TIMESTAMP }
+        - insert:
+            tableName: feature_flags
+            columns:
+              - column: { name: name, value: referral-bonus }
+              - column: { name: description, value: "Referral bonus campaign" }
+              - column: { name: global_enabled, valueBoolean: true }
+              - column: { name: state, value: ACTIVE }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: created_by, value: seed }
+              - column: { name: created_at, valueComputed: CURRENT_TIMESTAMP }
+              - column: { name: updated_by, value: seed }
+              - column: { name: updated_at, valueComputed: CURRENT_TIMESTAMP }
+
+  - changeSet:
+      id: 006-seed-demo-feature-overrides
+      author: feature-management-service
+      comment: >
+        Distinct per-user overrides for beta-dashboard and new-billing
+        (4 users each). Other seeded flags remain global-only.
+      preConditions:
+        - onFail: MARK_RAN
+        - sqlCheck:
+            expectedResult: 0
+            sql: >
+              SELECT COUNT(*) FROM feature_overrides o
+              JOIN feature_flags f ON f.id = o.flag_id
+              WHERE f.name = 'beta-dashboard' AND o.user_id = 'user-001'
+      changes:
+        # beta-dashboard (global true): mixed explicit overrides
+        - sql:
+            sql: >
+              INSERT INTO feature_overrides (flag_id, user_id, enabled, updated_by, updated_at)
+              SELECT id, 'user-001', FALSE, 'seed', CURRENT_TIMESTAMP FROM feature_flags WHERE name = 'beta-dashboard'
+        - sql:
+            sql: >
+              INSERT INTO feature_overrides (flag_id, user_id, enabled, updated_by, updated_at)
+              SELECT id, 'user-002', TRUE, 'seed', CURRENT_TIMESTAMP FROM feature_flags WHERE name = 'beta-dashboard'
+        - sql:
+            sql: >
+              INSERT INTO feature_overrides (flag_id, user_id, enabled, updated_by, updated_at)
+              SELECT id, 'user-003', FALSE, 'seed', CURRENT_TIMESTAMP FROM feature_flags WHERE name = 'beta-dashboard'
+        - sql:
+            sql: >
+              INSERT INTO feature_overrides (flag_id, user_id, enabled, updated_by, updated_at)
+              SELECT id, 'user-004', TRUE, 'seed', CURRENT_TIMESTAMP FROM feature_flags WHERE name = 'beta-dashboard'
+        # new-billing (global false): distinct enable/disable mix
+        - sql:
+            sql: >
+              INSERT INTO feature_overrides (flag_id, user_id, enabled, updated_by, updated_at)
+              SELECT id, 'user-001', TRUE, 'seed', CURRENT_TIMESTAMP FROM feature_flags WHERE name = 'new-billing'
+        - sql:
+            sql: >
+              INSERT INTO feature_overrides (flag_id, user_id, enabled, updated_by, updated_at)
+              SELECT id, 'user-002', FALSE, 'seed', CURRENT_TIMESTAMP FROM feature_flags WHERE name = 'new-billing'
+        - sql:
+            sql: >
+              INSERT INTO feature_overrides (flag_id, user_id, enabled, updated_by, updated_at)
+              SELECT id, 'user-003', TRUE, 'seed', CURRENT_TIMESTAMP FROM feature_flags WHERE name = 'new-billing'
+        - sql:
+            sql: >
+              INSERT INTO feature_overrides (flag_id, user_id, enabled, updated_by, updated_at)
+              SELECT id, 'user-004', TRUE, 'seed', CURRENT_TIMESTAMP FROM feature_flags WHERE name = 'new-billing'

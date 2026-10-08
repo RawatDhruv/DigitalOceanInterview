@@ -34,7 +34,12 @@ public class AuditService {
 		if (requestId == null || requestId.isBlank()) {
 			return Optional.empty();
 		}
-		return auditRepository.findFirstByRequestIdAndActionOrderByCreatedAtAsc(requestId, action)
+		Optional<Long> flagId = auditRepository.findFirstByRequestIdAndActionOrderByCreatedAtAsc(requestId, action)
 				.map(FeatureAudit::getFlagId);
+		flagId.ifPresentOrElse(
+				id -> log.debug("Idempotency key hit requestId={} action={} flagId={}", requestId, action, id),
+				() -> log.debug("Idempotency key miss requestId={} action={}", requestId, action)
+		);
+		return flagId;
 	}
 }

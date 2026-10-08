@@ -41,6 +41,16 @@ curl -s localhost:8080/actuator/prometheus   # when prometheus registry is on th
 
 Docker Compose (optional) starts Postgres + Redis — see `compose.yaml`. Prefer Homebrew scripts when Docker is unavailable.
 
+On startup, Liquibase seeds demo data (changeset `006-seed-demo-feature-data`):
+
+| Flag | Global | Overrides |
+| --- | --- | --- |
+| `beta-dashboard` | `true` | `user-001`–`user-004` (mixed true/false) |
+| `new-billing` | `false` | `user-001`–`user-004` (mixed true/false) |
+| `ai-assistant` | `true` | none |
+| `mobile-push` | `false` | none |
+| `referral-bonus` | `true` | none |
+
 ## Quick API examples
 
 ```bash

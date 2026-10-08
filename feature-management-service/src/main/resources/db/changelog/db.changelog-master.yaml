@@ -9,3 +9,5 @@ databaseChangeLog:
       file: db/changelog/changes/004-create-feature-overrides.yaml
   - include:
       file: db/changelog/changes/005-create-feature-audits.yaml
+  - include:
+      file: db/changelog/changes/006-seed-demo-feature-data.yaml

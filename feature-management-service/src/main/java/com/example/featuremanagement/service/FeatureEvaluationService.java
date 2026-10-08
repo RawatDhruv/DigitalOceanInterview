@@ -31,6 +31,7 @@ public class FeatureEvaluationService {
 	@Transactional(readOnly = true)
 	public EvaluationResponse evaluate(String flagName, String userId) {
 		long start = System.nanoTime();
+		log.debug("Evaluate start flag={} userId={}", flagName, userId);
 		try {
 			validateUserId(userId);
 
@@ -38,8 +39,13 @@ public class FeatureEvaluationService {
 			CachedOverride override = resolveOverride(flag.flagId(), userId);
 
 			if (override.value().isExplicit()) {
-				log.debug("Evaluating flag={} userId={} reason=USER_OVERRIDE enabled={} (cache-aware)",
-						flagName, userId, override.value().asBoolean());
+				log.debug(
+						"Evaluate result flag={} userId={} enabled={} reason=USER_OVERRIDE overrideValue={}",
+						flagName,
+						userId,
+						override.value().asBoolean(),
+						override.value()
+				);
 				return new EvaluationResponse(
 						flag.name(),
 						userId,
@@ -48,8 +54,12 @@ public class FeatureEvaluationService {
 				);
 			}
 
-			log.debug("Evaluating flag={} userId={} reason=GLOBAL enabled={} (cache-aware)",
-					flagName, userId, flag.globalEnabled());
+			log.debug(
+					"Evaluate result flag={} userId={} enabled={} reason=GLOBAL (inherit/no explicit override)",
+					flagName,
+					userId,
+					flag.globalEnabled()
+			);
 			return new EvaluationResponse(
 					flag.name(),
 					userId,
@@ -58,10 +68,12 @@ public class FeatureEvaluationService {
 			);
 		}
 		catch (FeatureNotFoundException | IllegalArgumentException | EvaluationUnavailableException ex) {
+			log.debug("Evaluate failed flag={} userId={} error={}", flagName, userId, ex.toString());
 			featureMetrics.recordEvaluationError();
 			throw ex;
 		}
 		catch (RuntimeException ex) {
+			log.debug("Evaluate unexpected failure flag={} userId={}", flagName, userId, ex);
 			featureMetrics.recordEvaluationError();
 			throw new EvaluationUnavailableException("Evaluation unavailable", ex);
 		}
@@ -73,12 +85,27 @@ public class FeatureEvaluationService {
 	private CachedFlag resolveFlag(String flagName) {
 		Optional<CachedFlag> cached = featureCacheService.getFlag(flagName);
 		if (cached.isPresent()) {
-			return cached.get();
+			CachedFlag flag = cached.get();
+			log.debug(
+					"Flag cache hit name={} flagId={} globalEnabled={} updatedAt={}",
+					flag.name(),
+					flag.flagId(),
+					flag.globalEnabled(),
+					flag.updatedAt()
+			);
+			return flag;
 		}
 
+		log.debug("Flag cache miss name={}; looking up PostgreSQL", flagName);
 		featureMetrics.recordDbFallback();
 		FeatureFlag flag = dbFallbackGuard.execute(() -> featureFlagService.getFlagEntity(flagName));
 		CachedFlag loaded = CachedFlag.from(flag);
+		log.debug(
+				"Flag loaded from DB name={} flagId={} globalEnabled={}; writing cache",
+				loaded.name(),
+				loaded.flagId(),
+				loaded.globalEnabled()
+		);
 		featureCacheService.putFlag(loaded);
 		return loaded;
 	}
@@ -86,19 +113,49 @@ public class FeatureEvaluationService {
 	private CachedOverride resolveOverride(Long flagId, String userId) {
 		Optional<CachedOverride> cached = featureCacheService.getOverride(flagId, userId);
 		if (cached.isPresent()) {
-			return cached.get();
+			CachedOverride override = cached.get();
+			log.debug(
+					"Override cache hit flagId={} userId={} value={} updatedAt={}",
+					flagId,
+					userId,
+					override.value(),
+					override.updatedAt()
+			);
+			return override;
 		}
 
+		log.debug("Override cache miss flagId={} userId={}; looking up PostgreSQL", flagId, userId);
 		featureMetrics.recordDbFallback();
 		Optional<FeatureOverride> fromDb = dbFallbackGuard.execute(
 				() -> overrideRepository.findByIdFlagIdAndIdUserId(flagId, userId)
 		);
 		if (fromDb.isPresent()) {
-			CachedOverride loaded = CachedOverride.from(fromDb.get());
+			FeatureOverride entity = fromDb.get();
+			CachedOverride loaded = CachedOverride.from(entity);
+			if (loaded.value().isExplicit()) {
+				log.debug(
+						"User override found in DB flagId={} userId={} enabled={}; writing cache",
+						flagId,
+						userId,
+						entity.getEnabled()
+				);
+			}
+			else {
+				log.debug(
+						"Override tombstone (INHERIT) found in DB flagId={} userId={}; writing cache",
+						flagId,
+						userId
+				);
+			}
 			featureCacheService.putOverride(flagId, userId, loaded);
 			return loaded;
 		}
 
+		log.debug(
+				"No override row in DB flagId={} userId={}; caching INHERIT and using global",
+				flagId,
+				userId
+		);
 		CachedOverride inherit = CachedOverride.inherit(Instant.now());
 		featureCacheService.putInherit(flagId, userId, inherit.updatedAt());
 		return inherit;

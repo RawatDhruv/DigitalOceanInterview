@@ -60,19 +60,23 @@ public class FeatureCacheService {
 	private final FeatureMetrics featureMetrics;
 
 	public Optional<CachedFlag> getFlag(String name) {
+		String key = flagKey(name);
 		try {
-			Map<Object, Object> entries = redisTemplate.opsForHash().entries(flagKey(name));
+			Map<Object, Object> entries = redisTemplate.opsForHash().entries(key);
 			if (entries == null || entries.isEmpty()) {
+				log.debug("Redis flag miss key={}", key);
 				featureMetrics.recordCacheMiss();
 				return Optional.empty();
 			}
-			featureMetrics.recordCacheHit();
-			return Optional.of(new CachedFlag(
+			CachedFlag flag = new CachedFlag(
 					Long.parseLong(stringField(entries, FIELD_FLAG_ID)),
 					stringField(entries, FIELD_NAME),
 					Boolean.parseBoolean(stringField(entries, FIELD_GLOBAL_ENABLED)),
 					Instant.parse(stringField(entries, FIELD_UPDATED_AT))
-			));
+			);
+			log.debug("Redis flag hit key={} flagId={} globalEnabled={}", key, flag.flagId(), flag.globalEnabled());
+			featureMetrics.recordCacheHit();
+			return Optional.of(flag);
 		}
 		catch (Exception ex) {
 			log.warn("Redis flag read failed for name={}: {}", name, ex.toString());
@@ -83,8 +87,17 @@ public class FeatureCacheService {
 	}
 
 	public void putFlag(CachedFlag flag) {
+		String key = flagKey(flag.name());
+		log.debug(
+				"Redis flag put key={} flagId={} globalEnabled={} updatedAt={} ttl={}",
+				key,
+				flag.flagId(),
+				flag.globalEnabled(),
+				flag.updatedAt(),
+				cacheProperties.flagTtl()
+		);
 		writeHashIfNewer(
-				flagKey(flag.name()),
+				key,
 				flag.updatedAt(),
 				cacheProperties.flagTtl(),
 				FIELD_FLAG_ID, flag.flagId().toString(),
@@ -95,21 +108,27 @@ public class FeatureCacheService {
 	}
 
 	public void evictFlag(String name) {
-		delete(flagKey(name));
+		String key = flagKey(name);
+		log.debug("Redis flag evict key={}", key);
+		delete(key);
 	}
 
 	public Optional<CachedOverride> getOverride(Long flagId, String userId) {
+		String key = overrideKey(flagId, userId);
 		try {
-			Map<Object, Object> entries = redisTemplate.opsForHash().entries(overrideKey(flagId, userId));
+			Map<Object, Object> entries = redisTemplate.opsForHash().entries(key);
 			if (entries == null || entries.isEmpty()) {
+				log.debug("Redis override miss key={}", key);
 				featureMetrics.recordCacheMiss();
 				return Optional.empty();
 			}
-			featureMetrics.recordCacheHit();
-			return Optional.of(new CachedOverride(
+			CachedOverride override = new CachedOverride(
 					OverrideCacheValue.valueOf(stringField(entries, FIELD_VALUE)),
 					Instant.parse(stringField(entries, FIELD_UPDATED_AT))
-			));
+			);
+			log.debug("Redis override hit key={} value={}", key, override.value());
+			featureMetrics.recordCacheHit();
+			return Optional.of(override);
 		}
 		catch (Exception ex) {
 			log.warn("Redis override read failed for flagId={} userId={}: {}", flagId, userId, ex.toString());
@@ -123,8 +142,16 @@ public class FeatureCacheService {
 		Duration ttl = override.value() == OverrideCacheValue.INHERIT
 				? cacheProperties.inheritTtl()
 				: cacheProperties.overrideTtl();
+		String key = overrideKey(flagId, userId);
+		log.debug(
+				"Redis override put key={} value={} updatedAt={} ttl={}",
+				key,
+				override.value(),
+				override.updatedAt(),
+				ttl
+		);
 		writeHashIfNewer(
-				overrideKey(flagId, userId),
+				key,
 				override.updatedAt(),
 				ttl,
 				FIELD_VALUE, override.value().name(),
@@ -137,7 +164,9 @@ public class FeatureCacheService {
 	}
 
 	public void evictOverride(Long flagId, String userId) {
-		delete(overrideKey(flagId, userId));
+		String key = overrideKey(flagId, userId);
+		log.debug("Redis override evict key={}", key);
+		delete(key);
 	}
 
 	static String flagKey(String name) {
