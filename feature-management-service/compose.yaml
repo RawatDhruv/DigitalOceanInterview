@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: fms-postgres
+    environment:
+      POSTGRES_DB: feature_management
+      POSTGRES_USER: fms
+      POSTGRES_PASSWORD: fms
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fms -d feature_management"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - fms-postgres-data:/var/lib/postgresql/data
+
+volumes:
+  fms-postgres-data:

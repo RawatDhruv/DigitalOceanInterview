@@ -1,0 +1,6 @@
+apiVersion: v2
+name: feature-management-service
+description: Helm chart for the Feature Management Service
+type: application
+version: 0.1.0
+appVersion: "0.0.1"

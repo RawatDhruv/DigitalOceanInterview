@@ -1,0 +1,36 @@
+# Dev environment values for feature-management-service
+
+replicaCount: 1
+
+image:
+  repository: feature-management-service
+  tag: dev
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+app:
+  serverPort: 8080
+  datasource:
+    url: jdbc:postgresql://fms-postgres.dev.svc.cluster.local:5432/feature_management
+    username: fms
+    password: fms
+
+ingress:
+  enabled: false
+  className: nginx
+  host: feature-management.dev.example.com
+  path: /
+  tls: false
+  tlsSecretName: feature-management-dev-tls

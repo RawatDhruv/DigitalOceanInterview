@@ -1,0 +1,48 @@
+# Default chart values. Environment-specific overrides live in values-<env>.yaml
+
+replicaCount: 1
+
+image:
+  repository: feature-management-service
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+probes:
+  liveness:
+    path: /actuator/health
+    initialDelaySeconds: 30
+    periodSeconds: 10
+  readiness:
+    path: /actuator/health
+    initialDelaySeconds: 10
+    periodSeconds: 5
+
+# Application config injected as environment variables (Spring Boot relaxed binding)
+app:
+  serverPort: 8080
+  datasource:
+    url: ""
+    username: ""
+    password: ""
+
+# Optional: set to create an Ingress
+ingress:
+  enabled: false
+  className: ""
+  host: ""
+  path: /
+  tls: false
+  tlsSecretName: ""
