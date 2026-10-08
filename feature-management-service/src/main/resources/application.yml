@@ -51,3 +51,12 @@ server:
   port: ${SERVER_PORT:8080}
   tomcat:
     connection-timeout: ${SERVER_TOMCAT_CONNECTION_TIMEOUT:5s}
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    url: /openapi.yaml
+    try-it-out-enabled: true

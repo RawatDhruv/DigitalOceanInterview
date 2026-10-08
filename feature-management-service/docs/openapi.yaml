@@ -1,0 +1,644 @@
+openapi: 3.0.3
+info:
+  title: Feature Management Service API
+  description: |
+    Boolean feature flags with global defaults, per-user overrides, evaluation,
+    and an immutable audit trail.
+
+    - Surrogate IDs are **BIGINT** (JSON numbers), not UUIDs.
+    - Actor attribution uses `X-Actor-Id` (default `local-admin`). Spring Security is deferred.
+    - Create supports idempotency via `Idempotency-Key` or `X-Request-Id`.
+  version: 0.0.1
+  contact:
+    name: Feature Management Service
+
+servers:
+  - url: http://localhost:8080
+    description: Local development
+
+tags:
+  - name: Flags
+    description: Feature flag CRUD
+  - name: Overrides
+    description: Per-user targeting overrides
+  - name: Evaluations
+    description: Runtime flag evaluation
+  - name: Audits
+    description: Immutable change history
+
+paths:
+  /api/v1/flags:
+    get:
+      tags: [Flags]
+      summary: List feature flags
+      operationId: listFlags
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Sort'
+      responses:
+        '200':
+          description: Paginated flags
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeatureFlagPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+    post:
+      tags: [Flags]
+      summary: Create a feature flag
+      operationId: createFlag
+      parameters:
+        - $ref: '#/components/parameters/ActorId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/RequestId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFlagRequest'
+            example:
+              name: new-checkout
+              description: Checkout redesign
+              globalEnabled: false
+              state: ACTIVE
+      responses:
+        '201':
+          description: Flag created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeatureFlagResponse'
+        '200':
+          description: Idempotent replay of a prior create with the same key
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeatureFlagResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+
+  /api/v1/flags/{name}:
+    parameters:
+      - $ref: '#/components/parameters/FlagName'
+    get:
+      tags: [Flags]
+      summary: Get a feature flag by name
+      operationId: getFlag
+      responses:
+        '200':
+          description: Flag found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeatureFlagResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags: [Flags]
+      summary: Partially update a feature flag
+      operationId: updateFlag
+      parameters:
+        - $ref: '#/components/parameters/ActorId'
+        - $ref: '#/components/parameters/RequestId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFlagRequest'
+            example:
+              description: Updated checkout
+              globalEnabled: true
+      responses:
+        '200':
+          description: Flag updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeatureFlagResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Optimistic lock conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+    delete:
+      tags: [Flags]
+      summary: Delete a feature flag
+      operationId: deleteFlag
+      parameters:
+        - $ref: '#/components/parameters/ActorId'
+        - $ref: '#/components/parameters/RequestId'
+      responses:
+        '204':
+          description: Flag deleted (overrides cascade; audit history retained)
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+
+  /api/v1/flags/{name}/overrides:
+    parameters:
+      - $ref: '#/components/parameters/FlagName'
+    get:
+      tags: [Overrides]
+      summary: List active overrides for a flag
+      operationId: listOverrides
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Sort'
+      responses:
+        '200':
+          description: Paginated active overrides (`enabled` is non-null)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeatureOverridePage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/flags/{name}/overrides/{userId}:
+    parameters:
+      - $ref: '#/components/parameters/FlagName'
+      - $ref: '#/components/parameters/UserId'
+    put:
+      tags: [Overrides]
+      summary: Upsert a user override
+      operationId: upsertOverride
+      parameters:
+        - $ref: '#/components/parameters/ActorId'
+        - $ref: '#/components/parameters/RequestId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpsertOverrideRequest'
+            example:
+              enabled: false
+      responses:
+        '200':
+          description: Override upserted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeatureOverrideResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+    delete:
+      tags: [Overrides]
+      summary: Remove a user override (INHERIT tombstone)
+      operationId: removeOverride
+      parameters:
+        - $ref: '#/components/parameters/ActorId'
+        - $ref: '#/components/parameters/RequestId'
+      responses:
+        '204':
+          description: Override removed; evaluation falls back to global
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+
+  /api/v1/flags/{name}/audits:
+    parameters:
+      - $ref: '#/components/parameters/FlagName'
+    get:
+      tags: [Audits]
+      summary: List audit events for a flag
+      operationId: listAudits
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Sort'
+      responses:
+        '200':
+          description: Paginated audit records (newest first by default)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeatureAuditPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/evaluations/{flagName}:
+    get:
+      tags: [Evaluations]
+      summary: Evaluate a flag for a user
+      description: |
+        Precedence: explicit non-null user override (`USER_OVERRIDE`) wins over
+        `globalEnabled` (`GLOBAL`). Missing or null override inherits global.
+      operationId: evaluateFlag
+      parameters:
+        - name: flagName
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/FlagName'
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 150
+          example: user-123
+      responses:
+        '200':
+          description: Evaluation result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationResponse'
+              examples:
+                global:
+                  value:
+                    flag: new-checkout
+                    userId: user-123
+                    enabled: true
+                    reason: GLOBAL
+                override:
+                  value:
+                    flag: new-checkout
+                    userId: user-123
+                    enabled: false
+                    reason: USER_OVERRIDE
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+
+components:
+  parameters:
+    FlagName:
+      name: name
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/FlagName'
+    UserId:
+      name: userId
+      in: path
+      required: true
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 150
+      example: user-123
+    ActorId:
+      name: X-Actor-Id
+      in: header
+      required: false
+      description: Actor performing the mutation (defaults to `local-admin`)
+      schema:
+        type: string
+        default: local-admin
+        maxLength: 100
+    RequestId:
+      name: X-Request-Id
+      in: header
+      required: false
+      description: Optional request correlation id stored on audit records
+      schema:
+        type: string
+        maxLength: 100
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: false
+      description: |
+        Optional create idempotency key. Retries with the same key return the
+        original flag with HTTP 200 instead of creating a duplicate.
+      schema:
+        type: string
+        maxLength: 100
+    Page:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    Size:
+      name: size
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 20
+    Sort:
+      name: sort
+      in: query
+      required: false
+      description: Spring Data sort (`property,asc|desc`)
+      schema:
+        type: string
+        example: name,asc
+
+  responses:
+    BadRequest:
+      description: Invalid input
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Flag not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Conflict:
+      description: Duplicate flag name or concurrent update conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    ServiceUnavailable:
+      description: Data store or evaluation fallback unavailable
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+  schemas:
+    FlagName:
+      type: string
+      minLength: 1
+      maxLength: 150
+      pattern: '^[a-z0-9]+(?:[_-][a-z0-9]+)*$'
+      description: Lowercase alphanumeric with optional hyphens/underscores
+      example: new-checkout
+
+    FlagState:
+      type: string
+      enum: [DRAFT, ACTIVE, ARCHIVED]
+
+    EvaluationReason:
+      type: string
+      enum: [GLOBAL, USER_OVERRIDE]
+
+    CreateFlagRequest:
+      type: object
+      required: [name, globalEnabled]
+      properties:
+        name:
+          $ref: '#/components/schemas/FlagName'
+        description:
+          type: string
+          maxLength: 2000
+          nullable: true
+        globalEnabled:
+          type: boolean
+        state:
+          allOf:
+            - $ref: '#/components/schemas/FlagState'
+          nullable: true
+          description: Defaults to DRAFT when omitted
+
+    UpdateFlagRequest:
+      type: object
+      properties:
+        description:
+          type: string
+          maxLength: 2000
+          nullable: true
+        globalEnabled:
+          type: boolean
+          nullable: true
+        state:
+          allOf:
+            - $ref: '#/components/schemas/FlagState'
+          nullable: true
+
+    UpsertOverrideRequest:
+      type: object
+      required: [enabled]
+      properties:
+        enabled:
+          type: boolean
+
+    FeatureFlagResponse:
+      type: object
+      required:
+        - id
+        - name
+        - globalEnabled
+        - state
+        - version
+        - createdBy
+        - createdAt
+        - updatedBy
+        - updatedAt
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: BIGINT identity
+        name:
+          $ref: '#/components/schemas/FlagName'
+        description:
+          type: string
+          nullable: true
+        globalEnabled:
+          type: boolean
+        state:
+          $ref: '#/components/schemas/FlagState'
+        version:
+          type: integer
+          format: int64
+        createdBy:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedBy:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+
+    FeatureOverrideResponse:
+      type: object
+      required: [flagId, flagName, userId, updatedBy, updatedAt]
+      properties:
+        flagId:
+          type: integer
+          format: int64
+        flagName:
+          $ref: '#/components/schemas/FlagName'
+        userId:
+          type: string
+        enabled:
+          type: boolean
+          nullable: true
+          description: Null means INHERIT tombstone (not returned in list of active overrides)
+        updatedBy:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+
+    FeatureAuditResponse:
+      type: object
+      required: [id, flagId, action, actorId, changeMap, createdAt]
+      properties:
+        id:
+          type: integer
+          format: int64
+        flagId:
+          type: integer
+          format: int64
+        action:
+          type: string
+          example: FLAG_UPDATED
+        actorId:
+          type: string
+        changeMap:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              previous:
+                description: Previous field value (any JSON type)
+              new:
+                description: New field value (any JSON type)
+          example:
+            globalEnabled:
+              previous: false
+              new: true
+        requestId:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+
+    EvaluationResponse:
+      type: object
+      required: [flag, userId, enabled, reason]
+      properties:
+        flag:
+          $ref: '#/components/schemas/FlagName'
+        userId:
+          type: string
+        enabled:
+          type: boolean
+        reason:
+          $ref: '#/components/schemas/EvaluationReason'
+
+    ErrorResponse:
+      type: object
+      required: [timestamp, status, error, message, path]
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+          example: 404
+        error:
+          type: string
+          example: Not Found
+        message:
+          type: string
+        path:
+          type: string
+
+    PageMeta:
+      type: object
+      properties:
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+
+    FeatureFlagPage:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/FeatureFlagResponse'
+        page:
+          $ref: '#/components/schemas/PageMeta'
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+        size:
+          type: integer
+        number:
+          type: integer
+
+    FeatureOverridePage:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/FeatureOverrideResponse'
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+        size:
+          type: integer
+        number:
+          type: integer
+
+    FeatureAuditPage:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/FeatureAuditResponse'
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+        size:
+          type: integer
+        number:
+          type: integer

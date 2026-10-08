@@ -6,6 +6,7 @@ Design docs:
 
 - [High-Level Design](./docs/high-level-design.md) — including the [evaluation-path architecture diagram](./docs/high-level-design.md#06--critical-flow-a--read-path-and-cache-consistency)
 - [Phased Development Plan](./docs/phased-development-plan.md)
+- [OpenAPI 3 spec](./docs/openapi.yaml) — Swagger UI at `http://localhost:8080/swagger-ui.html` when the app is running
 
 ## Prerequisites
 
