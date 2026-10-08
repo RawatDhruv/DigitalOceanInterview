@@ -1,0 +1,2159 @@
+{
+  "generated_at": "2026-10-08T08:56:00.799467+00:00",
+  "base_url": "http://localhost:8080",
+  "test_flag": "api-test-412810eb",
+  "summary": {
+    "total": 55,
+    "passed": 55,
+    "failed": 0,
+    "pass_rate": 100.0
+  },
+  "by_category": {
+    "Ops": {
+      "total": 6,
+      "passed": 6,
+      "failed": 0
+    },
+    "Flags": {
+      "total": 14,
+      "passed": 14,
+      "failed": 0
+    },
+    "Evaluations": {
+      "total": 11,
+      "passed": 11,
+      "failed": 0
+    },
+    "Overrides": {
+      "total": 8,
+      "passed": 8,
+      "failed": 0
+    },
+    "Audits": {
+      "total": 3,
+      "passed": 3,
+      "failed": 0
+    },
+    "Cache": {
+      "total": 2,
+      "passed": 2,
+      "failed": 0
+    },
+    "SeededFeatures": {
+      "total": 11,
+      "passed": 11,
+      "failed": 0
+    }
+  },
+  "tests": [
+    {
+      "name": "Actuator health",
+      "category": "Ops",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 55.06,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/actuator/health",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json",
+          "Date": "Thu, 08 Oct 2026 08:55:59 GMT"
+        },
+        "body": {
+          "groups": [
+            "liveness",
+            "readiness"
+          ],
+          "status": "UP"
+        },
+        "body_raw": "{\n  \"groups\": [\n    \"liveness\",\n    \"readiness\"\n  ],\n  \"status\": \"UP\"\n}"
+      }
+    },
+    {
+      "name": "Actuator info",
+      "category": "Ops",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 22.13,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/actuator/info",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json",
+          "Content-Length": "2",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {},
+        "body_raw": "{}"
+      }
+    },
+    {
+      "name": "Prometheus metrics scrape",
+      "category": "Ops",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": null,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/actuator/prometheus",
+        "headers": {
+          "Accept": "text/plain"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "text/plain;version=0.0.4;charset=utf-8",
+          "Content-Length": "53709"
+        },
+        "body": null,
+        "body_raw": "# HELP application_ready_time_seconds Time taken for the application to be ready to service requests\n# TYPE application_ready_time_seconds gauge\napplication_ready_time_seconds{application=\"feature-management-service\",main_application_class=\"com.example.featuremanagement.FeatureManagementServiceApplication\"} 5.546\n# HELP application_started_time_seconds Time taken to start the application\n# TYPE application_started_time_seconds gauge\napplication_started_time_seconds{application=\"feature-management-service\",main_application_class=\"com.example.featuremanagement.FeatureManagementServiceApplication\"} 5.488\n# HELP disk_free_bytes Usable space for path\n# TYPE disk_free_bytes gauge\ndisk_free_bytes{application=\"feature-management-service\",path=\"/workspaces/feature-management-service/.\"} 3.97711147008E11\n# HELP disk_total_bytes Total space for path\n# TYPE disk_total_bytes gauge\ndisk_total_bytes{application=\"feature-management-service\",path=\"/workspaces/feature-management-service/.\"} 4.11645771776E11\n# HELP executor_active_threads The approximate number of threads that are actively executing tasks\n# TYPE executor_active_threads gauge\nexecutor_active_threads{application=\"feature-management-service\",name=\"applicationTaskExecutor\"} 0.0\n# HELP executor_completed_tasks_total The approximate total number of tasks that have completed execution\n# TYPE executor_completed_tasks_total counter\nexecutor_completed_tasks_total{application=\"feature-management-service\",name=\"applicationTaskExecutor\"} 0.0\n# HELP executor_pool_core_threads The core number of threads for the pool\n# TYPE executor_pool_core_threads gauge\nexecutor_pool_core_threads{application=\"feature-management-service\",name=\"applicationTaskExecutor\"} 8.0\n# HELP executor_pool_max_threads The maximum allowed number of threads in the pool\n# TYPE executor_pool_max_threads gauge\nexecutor_pool_max_threads{application=\"feature-management-service\",name=\"applicationTaskExecutor\"} 2.147483647E9\n# HELP executor_pool_size_threads The current\n... [truncated] ..."
+      }
+    },
+    {
+      "name": "OpenAPI YAML served",
+      "category": "Ops",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 18.2,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/openapi.yaml",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/octet-stream",
+          "Content-Length": "17425",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": "openapi: 3.0.3\ninfo:\n  title: Feature Management Service API\n  description: |\n    Boolean feature flags with global defaults, per-user overrides, evaluation,\n    and an immutable audit trail.\n\n    - Surrogate IDs are **BIGINT** (JSON numbers), not UUIDs.\n    - Actor attribution uses `X-Actor-Id` (default `local-admin`). Spring Security is deferred.\n    - Create supports idempotency via `Idempotency-Key` or `X-Request-Id`.\n  version: 0.0.1\n  contact:\n    name: Feature Management Service\n\nservers:\n  - url: http://localhost:8080\n    description: Local development\n\ntags:\n  - name: Flags\n    description: Feature flag CRUD\n  - name: Overrides\n    description: Per-user targeting overrides\n  - name: Evaluations\n    description: Runtime flag evaluation\n  - name: Audits\n    description: Immutable change history\n\npaths:\n  /api/v1/flags:\n    get:\n      tags: [Flags]\n      summary: List feature flags\n      operationId: listFlags\n      parameters:\n        - $ref: '#/components/parameters/Page'\n        - $ref: '#/components/parameters/Size'\n        - $ref: '#/components/parameters/Sort'\n      responses:\n        '200':\n          description: Paginated flags\n          content:\n            application/json:\n              schema:\n                $ref: '#/components/schemas/FeatureFlagPage'\n        '400':\n          $ref: '#/components/responses/BadRequest'\n    post:\n      tags: [Flags]\n      summary: Create a feature flag\n      operationId: createFlag\n      parameters:\n        - $ref: '#/components/parameters/ActorId'\n        - $ref: '#/components/parameters/IdempotencyKey'\n        - $ref: '#/components/parameters/RequestId'\n      requestBody:\n        required: true\n        content:\n          application/json:\n            schema:\n              $ref: '#/components/schemas/CreateFlagRequest'\n            example:\n              name: new-checkout\n              description: Checkout redesign\n              globalEnabled: false\n              state: ACTIVE\n      responses:\n        '201':\n          description: Flag created\n          content:\n            application/json:\n              schema:\n                $ref: '#/components/schemas/FeatureFlagResponse'\n        '200':\n          description: Idempotent replay of a prior create with the same key\n          content:\n            application/json:\n              schema:\n                $ref: '#/components/schemas/FeatureFlagResponse'\n        '400':\n          $ref: '#/components/responses/BadRequest'\n        '409':\n          $ref: '#/components/responses/Conflict'\n        '503':\n          $ref: '#/components/responses/ServiceUnavailable'\n\n  /api/v1/flags/{name}:\n    parameters:\n      - $ref: '#/components/parameters/FlagName'\n    get:\n      tags: [Flags]\n      summary: Get a feature flag by name\n      operationId: getFlag\n      responses:\n        '200':\n          description: Flag found\n          content:\n            application/json:\n              schema:\n                $ref: '#/components/schemas/FeatureFlagResponse'\n        '400':\n          $ref: '#/components/responses/BadRequest'\n        '404':\n          $ref: '#/components/responses/NotFound'\n    patch:\n      tags: [Flags]\n      summary: Partially update a feature flag\n      operationId: updateFlag\n      parameters:\n        - $ref: '#/components/parameters/ActorId'\n        - $ref: '#/components/parameters/RequestId'\n      requestBody:\n        required: true\n        content:\n          application/json:\n            schema:\n              $ref: '#/components/schemas/UpdateFlagRequest'\n            example:\n              description: Updated checkout\n              globalEnabled: true\n      responses:\n        '200':\n          description: Flag updated\n          content:\n            application/json:\n              schema:\n                $ref: '#/components/schemas/FeatureFlagResponse'\n        '400':\n          $ref: '#/components/responses/BadRequest'\n        '404':\n          $ref: '#/components/responses/NotFound'\n        '409':\n          description: Optimistic lock conflict\n          content:\n            application/json:\n              schema:\n                $ref: '#/components/schemas/ErrorResponse'\n        '503':\n          $ref: '#/components/responses/ServiceUnavailable'\n    delete:\n      tags: [Flags]\n      summary: Delete a feature flag\n      operationId: deleteFlag\n      parameters:\n        - $ref: '#/components/parameters/ActorId'\n        - $ref: '#/components/parameters/RequestId'\n      responses:\n        '204':\n          description: Flag deleted (overrides cascade; audit history retained)\n        '400':\n          $ref: '#/components/responses/BadRequest'\n        '404':\n          $ref: '#/components/responses/NotFound'\n        '503':\n          $ref: '#/components/responses/ServiceUnavailable'\n\n  /api/v1/flags/{name}/overrides:\n    parameters:\n      - $ref: '#/components/parameters/FlagName'\n    get:\n      tags: [Overrides]\n      summary: List active overrides for a flag\n      operationId: listOverrides\n      parameters:\n        - $ref: '#/components/parameters/Page'\n        - $ref: '#/components/parameters/Size'\n        - $ref: '#/components/parameters/Sort'\n      responses:\n        '200':\n          description: Paginated active overrides (`enabled` is non-null)\n          content:\n            application/json:\n              schema:\n                $ref: '#/components/schemas/FeatureOverridePage'\n        '400':\n          $ref: '#/components/responses/BadRequest'\n        '404':\n          $ref: '#/components/responses/NotFound'\n\n  /api/v1/flags/{name}/overrides/{userId}:\n    parameters:\n      - $ref: '#/components/parameters/FlagName'\n      - $ref: '#/components/parameters/UserId'\n    put:\n      tags: [Overrides]\n      summary: Upsert a user override\n      operationId: upsertOverride\n      parameters:\n        - $ref: '#/components/parameters/ActorId'\n        - $ref: '#/components/parameters/RequestId'\n      requestBody:\n        required: true\n        content:\n          application/json:\n            schema:\n              $ref: '#/components/schemas/UpsertOverrideRequest'\n            example:\n              enabled: false\n      responses:\n        '200':\n          description: Override upserted\n          content:\n            application/json:\n              schema:\n                $ref: '#/components/schemas/FeatureOverrideResponse'\n        '400':\n          $ref: '#/components/responses/BadRequest'\n        '404':\n          $ref: '#/components/responses/NotFound'\n        '503':\n          $ref: '#/components/responses/ServiceUnavailable'\n    delete:\n      tags: [Overrides]\n      summary: Remove a user override (INHERIT tombstone)\n      operationId: removeOverride\n      parameters:\n        - $ref: '#/components/parameters/ActorId'\n        - $ref: '#/components/parameters/RequestId'\n      responses:\n        '204':\n          description: Override removed; evaluation falls back to global\n        '400':\n          $ref: '#/components/responses/BadRequest'\n        '404':\n          $ref: '#/components/responses/NotFound'\n        '503':\n          $ref: '#/components/responses/ServiceUnavailable'\n\n  /api/v1/flags/{name}/audits:\n    parameters:\n      - $ref: '#/components/parameters/FlagName'\n    get:\n      tags: [Audits]\n      summary: List audit events for a flag\n      operationId: listAudits\n      parameters:\n        - $ref: '#/components/parameters/Page'\n        - $ref: '#/components/parameters/Size'\n        - $ref: '#/components/parameters/Sort'\n      responses:\n        '200':\n          description: Paginated audit records (newest first by default)\n          content:\n            application/json:\n              schema:\n                $ref: '#/components/schemas/FeatureAuditPage'\n        '400':\n          $ref: '#/components/responses/BadRequest'\n        '404':\n          $ref: '#/components/responses/NotFound'\n\n  /api/v1/evaluations/{flagName}:\n    get:\n      tags: [Evaluations]\n      summary: Evaluate a flag for a user\n      description: |\n        Precedence: explicit non-null user override (`USER_OVERRIDE`) wins over\n        `globalEnabled` (`GLOBAL`). Missing or null override inherits global.\n      operationId: evaluateFlag\n      parameters:\n        - name: flagName\n          in: path\n          required: true\n          schema:\n            $ref: '#/components/schemas/FlagName'\n        - name: userId\n          in: query\n          required: true\n          schema:\n            type: string\n            minLength: 1\n            maxLength: 150\n          example: user-123\n      responses:\n        '200':\n          description: Evaluation result\n          content:\n            application/json:\n              schema:\n                $ref: '#/components/schemas/EvaluationResponse'\n              examples:\n                global:\n                  value:\n                    flag: new-checkout\n                    userId: user-123\n                    enabled: true\n                    reason: GLOBAL\n                override:\n                  value:\n                    flag: new-checkout\n                    userId: user-123\n                    enabled: false\n                    reason: USER_OVERRIDE\n        '400':\n          $ref: '#/components/responses/BadRequest'\n        '404':\n          $ref: '#/components/responses/NotFound'\n        '503':\n          $ref: '#/components/responses/ServiceUnavailable'\n\ncomponents:\n  parameters:\n    FlagName:\n      name: name\n      in: path\n      required: true\n      schema:\n        $ref: '#/components/schemas/FlagName'\n    UserId:\n      name: userId\n      in: path\n      required: true\n      schema:\n        type: string\n        minLength: 1\n        maxLength: 150\n      example: user-123\n    ActorId:\n      name: X-Actor-Id\n      in: header\n      required: false\n      description: Actor performing the mutation (defaults to `local-admin`)\n      schema:\n        type: string\n        default: local-admin\n        maxLength: 100\n    RequestId:\n      name: X-Request-Id\n      in: header\n      required: false\n      description: Optional request correlation id stored on audit records\n      schema:\n        type: string\n        maxLength: 100\n    IdempotencyKey:\n      name: Idempotency-Key\n      in: header\n      required: false\n      description: |\n        Optional create idempotency key. Retries with the same key return the\n        original flag with HTTP 200 instead of creating a duplicate.\n      schema:\n        type: string\n        maxLength: 100\n    Page:\n      name: page\n      in: query\n      required: false\n      schema:\n        type: integer\n        minimum: 0\n        default: 0\n    Size:\n      name: size\n      in: query\n      required: false\n      schema:\n        type: integer\n        minimum: 1\n        default: 20\n    Sort:\n      name: sort\n      in: query\n      required: false\n      description: Spring Data sort (`property,asc|desc`)\n      schema:\n        type: string\n        example: name,asc\n\n  responses:\n    BadRequest:\n      description: Invalid input\n      content:\n        application/json:\n          schema:\n            $ref: '#/components/schemas/ErrorResponse'\n    NotFound:\n      description: Flag not found\n      content:\n        application/json:\n          schema:\n            $ref: '#/components/schemas/ErrorResponse'\n    Conflict:\n      description: Duplicate flag name or concurrent update conflict\n      content:\n        application/json:\n          schema:\n            $ref: '#/components/schemas/ErrorResponse'\n    ServiceUnavailable:\n      description: Data store or evaluation fallback unavailable\n      content:\n        application/json:\n          schema:\n            $ref: '#/components/schemas/ErrorResponse'\n\n  schemas:\n    FlagName:\n      type: string\n      minLength: 1\n      maxLength: 150\n      pattern: '^[a-z0-9]+(?:[_-][a-z0-9]+)*$'\n      description: Lowercase alphanumeric with optional hyphens/underscores\n      example: new-checkout\n\n    FlagState:\n      type: string\n      enum: [DRAFT, ACTIVE, ARCHIVED]\n\n    EvaluationReason:\n      type: string\n      enum: [GLOBAL, USER_OVERRIDE]\n\n    CreateFlagRequest:\n      type: object\n      required: [name, globalEnabled]\n      properties:\n        name:\n          $ref: '#/components/schemas/FlagName'\n        description:\n          type: string\n          maxLength: 2000\n          nullable: true\n        globalEnabled:\n          type: boolean\n        state:\n          allOf:\n            - $ref: '#/components/schemas/FlagState'\n          nullable: true\n          description: Defaults to DRAFT when omitted\n\n    UpdateFlagRequest:\n      type: object\n      properties:\n        description:\n          type: string\n          maxLength: 2000\n          nullable: true\n        globalEnabled:\n          type: boolean\n          nullable: true\n        state:\n          allOf:\n            - $ref: '#/components/schemas/FlagState'\n          nullable: true\n\n    UpsertOverrideRequest:\n      type: object\n      required: [enabled]\n      properties:\n        enabled:\n          type: boolean\n\n    FeatureFlagResponse:\n      type: object\n      required:\n        - id\n        - name\n        - globalEnabled\n        - state\n        - version\n        - createdBy\n        - createdAt\n        - updatedBy\n        - updatedAt\n      properties:\n        id:\n          type: integer\n          format: int64\n          description: BIGINT identity\n        name:\n          $ref: '#/components/schemas/FlagName'\n        description:\n          type: string\n          nullable: true\n        globalEnabled:\n          type: boolean\n        state:\n          $ref: '#/components/schemas/FlagState'\n        version:\n          type: integer\n          format: int64\n        createdBy:\n          type: string\n        createdAt:\n          type: string\n          format: date-time\n        updatedBy:\n          type: string\n        updatedAt:\n          type: string\n          format: date-time\n\n    FeatureOverrideResponse:\n      type: object\n      required: [flagId, flagName, userId, updatedBy, updatedAt]\n      properties:\n        flagId:\n          type: integer\n          format: int64\n        flagName:\n          $ref: '#/components/schemas/FlagName'\n        userId:\n          type: string\n        enabled:\n          type: boolean\n          nullable: true\n          description: Null means INHERIT tombstone (not returned in list of active overrides)\n        updatedBy:\n          type: string\n        updatedAt:\n          type: string\n          format: date-time\n\n    FeatureAuditResponse:\n      type: object\n      required: [id, flagId, action, actorId, changeMap, createdAt]\n      properties:\n        id:\n          type: integer\n          format: int64\n        flagId:\n          type: integer\n          format: int64\n        action:\n          type: string\n          example: FLAG_UPDATED\n        actorId:\n          type: string\n        changeMap:\n          type: object\n          additionalProperties:\n            type: object\n            properties:\n              previous:\n                description: Previous field value (any JSON type)\n              new:\n                description: New field value (any JSON type)\n          example:\n            globalEnabled:\n              previous: false\n              new: true\n        requestId:\n          type: string\n          nullable: true\n        createdAt:\n          type: string\n          format: date-time\n\n    EvaluationResponse:\n      type: object\n      required: [flag, userId, enabled, reason]\n      properties:\n        flag:\n          $ref: '#/components/schemas/FlagName'\n        userId:\n          type: string\n        enabled:\n          type: boolean\n        reason:\n          $ref: '#/components/schemas/EvaluationReason'\n\n    ErrorResponse:\n      type: object\n      required: [timestamp, status, error, message, path]\n      properties:\n        timestamp:\n          type: string\n          format: date-time\n        status:\n          type: integer\n          example: 404\n        error:\n          type: string\n          example: Not Found\n        message:\n          type: string\n        path:\n          type: string\n\n    PageMeta:\n      type: object\n      properties:\n        page:\n          type: integer\n        size:\n          type: integer\n        totalElements:\n          type: integer\n          format: int64\n        totalPages:\n          type: integer\n\n    FeatureFlagPage:\n      type: object\n      properties:\n        content:\n          type: array\n          items:\n            $ref: '#/components/schemas/FeatureFlagResponse'\n        page:\n          $ref: '#/components/schemas/PageMeta'\n        totalElements:\n          type: integer\n          format: int64\n        totalPages:\n          type: integer\n        size:\n          type: integer\n        number:\n          type: integer\n\n    FeatureOverridePage:\n      type: object\n      properties:\n        content:\n          type: array\n          items:\n            $ref: '#/components/schemas/FeatureOverrideResponse'\n        totalElements:\n          type: integer\n          format: int64\n        totalPages:\n          type: integer\n        size:\n          type: integer\n        number:\n          type: integer\n\n    FeatureAuditPage:\n      type: object\n      properties:\n        content:\n          type: array\n          items:\n            $ref: '#/components/schemas/FeatureAuditResponse'\n        totalElements:\n          type: integer\n          format: int64\n        totalPages:\n          type: integer\n        size:\n          type: integer\n        number:\n          type: integer\n",
+        "body_raw": "openapi: 3.0.3\ninfo:\n  title: Feature Management Service API\n  description: |\n    Boolean feature flags with global defaults, per-user overrides, evaluation,\n    and an immutable audit trail.\n\n    - Surrogate IDs are **BIGINT** (JSON numbers), not UUIDs.\n    - Actor attribution uses `X-Actor-Id` (default `local-admin`). Spring Security is deferred.\n    - Create supports idempotency via `Idempotency-Key` or `X-Request-Id`.\n  version: 0.0.1\n  contact:\n    name: Feature Management Service\n\nservers:\n  - url: http://localhost:8080\n    description: Local development\n\ntags:\n  - name: Flags\n    description: Feature flag CRUD\n  - name: Overrides\n    description: Per-user targeting overrides\n  - name: Evaluations\n    description: Runtime flag evaluation\n  - name: Audits\n    description: Immutable change history\n\npaths:\n  /api/v1/flags:\n    get:\n      tags: [Flags]\n      summary: List feature flags\n      operationId: listFlags\n      parameters:\n        - $ref: '#/components/parameters/Page'\n        - $ref: '#/components/parameters/Size'\n        - $ref: '#/components/parameters/Sort'\n      responses:\n        '200':\n          description: Paginated flags\n          content:\n            application/json:\n              schema:\n                $ref: '#/components/schemas/FeatureFlagPage'\n        '400':\n          $ref: '#/components/responses/BadRequest'\n    post:\n      tags: [Flags]\n      summary: Create a feature flag\n      operationId: createFlag\n      parameters:\n        - $ref: '#/components/parameters/ActorId'\n        - $ref: '#/components/parameters/IdempotencyKey'\n        - $ref: '#/components/parameters/RequestId'\n      requestBody:\n        required: true\n        content:\n          application/json:\n            schema:\n              $ref: '#/components/schemas/CreateFlagRequest'\n            example:\n              name: new-checkout\n              description: Checkout redesign\n              globalEnabled: false\n              state: ACTIVE\n      responses:\n        '201':\n          description: Flag created\n          content:\n            application/json:\n              schema:\n                $ref: '#/components/schemas/FeatureFlagResponse'\n        '200':\n          description: Idempotent replay of a prior create with the same key\n          content:\n            application/json:\n              schema:\n                $ref: '#/components/schemas/FeatureFlagResponse'\n        '400':\n          $ref: '#/components/responses/BadRequest'\n        '409':\n          $ref: '#/components/responses/Conflict'\n        '503':\n          $ref: '#/components/responses/ServiceUnavailable'\n\n  /api/v1/flags/{name}:\n    parameters:\n      - $ref: '#/components/parameters/FlagName'\n    get:\n      tags: [Flags]\n      summary: Get a feature flag by name\n      operationId: getFlag\n      responses:\n        '200':\n          description: Flag found\n          content:\n            application/json:\n              schema:\n                $ref: '#/components/schemas/FeatureFlagResponse'\n        '400':\n          $ref: '#/components/responses/BadRequest'\n        '404':\n          $ref: '#/components/responses/NotFound'\n    patch:\n      tags: [Flags]\n      summary: Partially update a feature flag\n      operationId: updateFlag\n      parameters:\n        - $ref: '#/components/parameters/ActorId'\n        - $ref: '#/components/parameters/RequestId'\n      requestBody:\n        required: true\n        content:\n          application/json:\n            schema:\n              $ref: '#/components/schemas/UpdateFlagRequest'\n            example:\n              description: Updated checkout\n              globalEnabled: true\n      responses:\n        '200':\n          description: Flag updated\n          content:\n            application/json:\n              schema:\n                $ref: '#/components/schemas/FeatureFlagResponse'\n        '400':\n          $ref: '#/components/responses/BadRequest'\n        '404':\n          $ref: '#/components/responses/NotFound'\n        '409':\n          description: Optimistic lock conflict\n          content:\n            application/json:\n              schema:\n                $ref: '#/components/schemas/ErrorResponse'\n        '503':\n          $ref: '#/components/responses/ServiceUnavailable'\n    delete:\n      tags: [Flags]\n      summary: Delete a feature flag\n      operationId: deleteFlag\n      parameters:\n        - $ref: '#/components/parameters/ActorId'\n        - $ref: '#/components/parameters/RequestId'\n      responses:\n        '204':\n          description: Flag deleted (overrides cascade; audit history retained)\n        '400':\n          $ref: '#/components/responses/BadRequest'\n        '404':\n          $ref: '#/components/responses/NotFound'\n        '503':\n          $ref: '#/components/responses/ServiceUnavailable'\n\n  /api/v1/flags/{name}/overrides:\n    parameters:\n      - $ref: '#/components/parameters/FlagName'\n    get:\n      tags: [Overrides]\n      summary: List active overrides for a flag\n      operationId: listOverrides\n      parameters:\n        - $ref: '#/components/parameters/Page'\n        - $ref: '#/components/parameters/Size'\n        - $ref: '#/components/parameters/Sort'\n      responses:\n        '200':\n          description: Paginated active overrides (`enabled` is non-null)\n          content:\n            application/json:\n              schema:\n                $ref: '#/components/schemas/FeatureOverridePage'\n        '400':\n          $ref: '#/components/responses/BadRequest'\n        '404':\n          $ref: '#/components/responses/NotFound'\n\n  /api/v1/flags/{name}/overrides/{userId}:\n    parameters:\n      - $ref: '#/components/parameters/FlagName'\n      - $ref: '#/components/parameters/UserId'\n    put:\n      tags: [Overrides]\n      summary: Upsert a user override\n      operationId: upsertOverride\n      parameters:\n        - $ref: '#/components/parameters/ActorId'\n        - $ref: '#/components/parameters/RequestId'\n      requestBody:\n        required: true\n        content:\n          application/json:\n            schema:\n              $ref: '#/components/schemas/UpsertOverrideRequest'\n            example:\n              enabled: false\n      responses:\n        '200':\n          description: Override upserted\n          content:\n            application/json:\n              schema:\n                $ref: '#/components/schemas/FeatureOverrideResponse'\n        '400':\n          $ref: '#/components/responses/BadRequest'\n        '404':\n          $ref: '#/components/responses/NotFound'\n        '503':\n          $ref: '#/components/responses/ServiceUnavailable'\n    delete:\n      tags: [Overrides]\n      summary: Remove a user override (INHERIT tombstone)\n      operationId: removeOverride\n      parameters:\n        - $ref: '#/components/parameters/ActorId'\n        - $ref: '#/components/parameters/RequestId'\n      responses:\n        '204':\n          description: Override removed; evaluation falls back to global\n        '400':\n          $ref: '#/components/responses/BadRequest'\n        '404':\n          $ref: '#/components/responses/NotFound'\n        '503':\n          $ref: '#/components/responses/ServiceUnavailable'\n\n  /api/v1/flags/{name}/audits:\n    parameters:\n      - $ref: '#/components/parameters/FlagName'\n    get:\n      tags: [Audits]\n      summary: List audit events for a flag\n      operationId: listAudits\n      parameters:\n        - $ref: '#/components/parameters/Page'\n        - $ref: '#/components/parameters/Size'\n        - $ref: '#/components/parameters/Sort'\n      responses:\n        '200':\n          description: Paginated audit records (newest first by default)\n          content:\n            application/json:\n              schema:\n                $ref: '#/components/schemas/FeatureAuditPage'\n        '400':\n          $ref: '#/components/responses/BadRequest'\n        '404':\n          $ref: '#/components/responses/NotFound'\n\n  /api/v1/evaluations/{flagName}:\n    get:\n      tags: [Evaluations]\n      summary: Evaluate a flag for a user\n      description: |\n        Precedence: explicit non-null user override (`USER_OVERRIDE`) wins over\n        `globalEnabled` (`GLOBAL`). Missing or null override inherits global.\n      operationId: evaluateFlag\n      parameters:\n        - name: flagName\n          in: path\n          required: true\n          schema:\n            $ref: '#/components/schemas/FlagName'\n        - name: userId\n          in: query\n          required: true\n          schema:\n            type: string\n            minLength: 1\n            maxLength: 150\n          example: user-123\n      responses:\n        '200':\n          description: Evaluation result\n          content:\n            application/json:\n              schema:\n                $ref: '#/components/schemas/EvaluationResponse'\n              examples:\n                global:\n                  value:\n                    flag: new-checkout\n                    userId: user-123\n                    enabled: true\n                    reason: GLOBAL\n                override:\n                  value:\n                    flag: new-checkout\n                    userId: user-123\n                    enabled: false\n                    reason: USER_OVERRIDE\n        '400':\n          $ref: '#/components/responses/BadRequest'\n        '404':\n          $ref: '#/components/responses/NotFound'\n        '503':\n          $ref: '#/components/responses/ServiceUnavailable'\n\ncomponents:\n  parameters:\n    FlagName:\n      name: name\n      in: path\n      required: true\n      schema:\n        $ref: '#/components/schemas/FlagName'\n    UserId:\n      name: userId\n      in: path\n      required: true\n      schema:\n        type: string\n        minLength: 1\n        maxLength: 150\n      example: user-123\n    ActorId:\n      name: X-Actor-Id\n      in: header\n      required: false\n      description: Actor performing the mutation (defaults to `local-admin`)\n      schema:\n        type: string\n        default: local-admin\n        maxLength: 100\n    RequestId:\n      name: X-Request-Id\n      in: header\n      required: false\n      description: Optional request correlation id stored on audit records\n      schema:\n        type: string\n        maxLength: 100\n    IdempotencyKey:\n      name: Idempotency-Key\n      in: header\n      required: false\n      description: |\n        Optional create idempotency key. Retries with the same key return the\n        original flag with HTTP 200 instead of creating a duplicate.\n      schema:\n        type: string\n        maxLength: 100\n    Page:\n      name: page\n      in: query\n      required: false\n      schema:\n        type: integer\n        minimum: 0\n        default: 0\n    Size:\n      name: size\n      in: query\n      required: false\n      schema:\n        type: integer\n        minimum: 1\n        default: 20\n    Sort:\n      name: sort\n      in: query\n      required: false\n      description: Spring Data sort (`property,asc|desc`)\n      schema:\n        type: string\n        example: name,asc\n\n  responses:\n    BadRequest:\n      description: Invalid input\n      content:\n        application/json:\n          schema:\n            $ref: '#/components/schemas/ErrorResponse'\n    NotFound:\n      description: Flag not found\n      content:\n        application/json:\n          schema:\n            $ref: '#/components/schemas/ErrorResponse'\n    Conflict:\n      description: Duplicate flag name or concurrent update conflict\n      content:\n        application/json:\n          schema:\n            $ref: '#/components/schemas/ErrorResponse'\n    ServiceUnavailable:\n      description: Data store or evaluation fallback unavailable\n      content:\n        application/json:\n          schema:\n            $ref: '#/components/schemas/ErrorResponse'\n\n  schemas:\n    FlagName:\n      type: string\n      minLength: 1\n      maxLength: 150\n      pattern: '^[a-z0-9]+(?:[_-][a-z0-9]+)*$'\n      description: Lowercase alphanumeric with optional hyphens/underscores\n      example: new-checkout\n\n    FlagState:\n      type: string\n      enum: [DRAFT, ACTIVE, ARCHIVED]\n\n    EvaluationReason:\n      type: string\n      enum: [GLOBAL, USER_OVERRIDE]\n\n    CreateFlagRequest:\n      type: object\n      required: [name, globalEnabled]\n      properties:\n        name:\n          $ref: '#/components/schemas/FlagName'\n        description:\n          type: string\n          maxLength: 2000\n          nullable: true\n        globalEnabled:\n          type: boolean\n        state:\n          allOf:\n            - $ref: '#/components/schemas/FlagState'\n          nullable: true\n          description: Defaults to DRAFT when omitted\n\n    UpdateFlagRequest:\n      type: object\n      properties:\n        description:\n          type: string\n          maxLength: 2000\n          nullable: true\n        globalEnabled:\n          type: boolean\n          nullable: true\n        state:\n          allOf:\n            - $ref: '#/components/schemas/FlagState'\n          nullable: true\n\n    UpsertOverrideRequest:\n      type: object\n      required: [enabled]\n      properties:\n        enabled:\n          type: boolean\n\n    FeatureFlagResponse:\n      type: object\n      required:\n        - id\n        - name\n        - globalEnabled\n        - state\n        - version\n        - createdBy\n        - createdAt\n        - updatedBy\n        - updatedAt\n      properties:\n        id:\n          type: integer\n          format: int64\n          description: BIGINT identity\n        name:\n          $ref: '#/components/schemas/FlagName'\n        description:\n          type: string\n          nullable: true\n        globalEnabled:\n          type: boolean\n        state:\n          $ref: '#/components/schemas/FlagState'\n        version:\n          type: integer\n          format: int64\n        createdBy:\n          type: string\n        createdAt:\n          type: string\n          format: date-time\n        updatedBy:\n          type: string\n        updatedAt:\n          type: string\n          format: date-time\n\n    FeatureOverrideResponse:\n      type: object\n      required: [flagId, flagName, userId, updatedBy, updatedAt]\n      properties:\n        flagId:\n          type: integer\n          format: int64\n        flagName:\n          $ref: '#/components/schemas/FlagName'\n        userId:\n          type: string\n        enabled:\n          type: boolean\n          nullable: true\n          description: Null means INHERIT tombstone (not returned in list of active overrides)\n        updatedBy:\n          type: string\n        updatedAt:\n          type: string\n          format: date-time\n\n    FeatureAuditResponse:\n      type: object\n      required: [id, flagId, action, actorId, changeMap, createdAt]\n      properties:\n        id:\n          type: integer\n          format: int64\n        flagId:\n          type: integer\n          format: int64\n        action:\n          type: string\n          example: FLAG_UPDATED\n        actorId:\n          type: string\n        changeMap:\n          type: object\n          additionalProperties:\n            type: object\n            properties:\n              previous:\n                description: Previous field value (any JSON type)\n              new:\n                description: New field value (any JSON type)\n          example:\n            globalEnabled:\n              previous: false\n              new: true\n        requestId:\n          type: string\n          nullable: true\n        createdAt:\n          type: string\n          format: date-time\n\n    EvaluationResponse:\n      type: object\n      required: [flag, userId, enabled, reason]\n      properties:\n        flag:\n          $ref: '#/components/schemas/FlagName'\n        userId:\n          type: string\n        enabled:\n          type: boolean\n        reason:\n          $ref: '#/components/schemas/EvaluationReason'\n\n    ErrorResponse:\n      type: object\n      required: [timestamp, status, error, message, path]\n      properties:\n        timestamp:\n          type: string\n          format: date-time\n        status:\n          type: integer\n          example: 404\n        error:\n          type: string\n          example: Not Found\n        message:\n          type: string\n        path:\n          type: string\n\n    PageMeta:\n      type: object\n      properties:\n        page:\n          type: integer\n        size:\n          type: integer\n        totalElements:\n          type: integer\n          format: int64\n        totalPages:\n          type: integer\n\n    FeatureFlagPage:\n      type: object\n      properties:\n        content:\n          type: array\n          items:\n            $ref: '#/components/schemas/FeatureFlagResponse'\n        page:\n          $ref: '#/components/schemas/PageMeta'\n        totalElements:\n          type: integer\n          format: int64\n        totalPages:\n          type: integer\n        size:\n          type: integer\n        number:\n          type: integer\n\n    FeatureOverridePage:\n      type: object\n      properties:\n        content:\n          type: array\n          items:\n            $ref: '#/components/schemas/FeatureOverrideResponse'\n        totalElements:\n          type: integer\n          format: int64\n        totalPages:\n          type: integer\n        size:\n          type: integer\n        number:\n          type: integer\n\n    FeatureAuditPage:\n      type: object\n      properties:\n        content:\n          type: array\n          items:\n            $ref: '#/components/schemas/FeatureAuditResponse'\n        totalElements:\n          type: integer\n          format: int64\n        totalPages:\n          type: integer\n        size:\n          type: integer\n        number:\n          type: integer\n"
+      }
+    },
+    {
+      "name": "List flags (seeded)",
+      "category": "Flags",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 16.41,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/v1/flags?page=0&size=20&sort=name,asc",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json",
+          "Content-Length": "1541",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "content": [
+            {
+              "id": 3,
+              "name": "ai-assistant",
+              "description": "In-product AI assistant",
+              "globalEnabled": true,
+              "state": "ACTIVE",
+              "version": 0,
+              "createdBy": "seed",
+              "createdAt": "2026-10-08T08:47:23.380906Z",
+              "updatedBy": "seed",
+              "updatedAt": "2026-10-08T08:47:23.380906Z"
+            },
+            {
+              "id": 1,
+              "name": "beta-dashboard",
+              "description": "Beta dashboard experience",
+              "globalEnabled": true,
+              "state": "ACTIVE",
+              "version": 0,
+              "createdBy": "seed",
+              "createdAt": "2026-10-08T08:47:23.380906Z",
+              "updatedBy": "seed",
+              "updatedAt": "2026-10-08T08:47:23.380906Z"
+            },
+            {
+              "id": 4,
+              "name": "mobile-push",
+              "description": "Mobile push notifications",
+              "globalEnabled": false,
+              "state": "DRAFT",
+              "version": 0,
+              "createdBy": "seed",
+              "createdAt": "2026-10-08T08:47:23.380906Z",
+              "updatedBy": "seed",
+              "updatedAt": "2026-10-08T08:47:23.380906Z"
+            },
+            {
+              "id": 2,
+              "name": "new-billing",
+              "description": "New billing checkout flow",
+              "globalEnabled": false,
+              "state": "ACTIVE",
+              "version": 0,
+              "createdBy": "seed",
+              "createdAt": "2026-10-08T08:47:23.380906Z",
+              "updatedBy": "seed",
+              "updatedAt": "2026-10-08T08:47:23.380906Z"
+            },
+            {
+              "id": 5,
+              "name": "referral-bonus",
+              "description": "Referral bonus campaign",
+              "globalEnabled": true,
+              "state": "ACTIVE",
+              "version": 0,
+              "createdBy": "seed",
+              "createdAt": "2026-10-08T08:47:23.380906Z",
+              "updatedBy": "seed",
+              "updatedAt": "2026-10-08T08:47:23.380906Z"
+            }
+          ],
+          "empty": false,
+          "first": true,
+          "last": true,
+          "number": 0,
+          "numberOfElements": 5,
+          "pageable": {
+            "offset": 0,
+            "pageNumber": 0,
+            "pageSize": 20,
+            "paged": true,
+            "sort": {
+              "empty": false,
+              "sorted": true,
+              "unsorted": false
+            },
+            "unpaged": false
+          },
+          "size": 20,
+          "sort": {
+            "empty": false,
+            "sorted": true,
+            "unsorted": false
+          },
+          "totalElements": 5,
+          "totalPages": 1
+        },
+        "body_raw": "{\n  \"content\": [\n    {\n      \"id\": 3,\n      \"name\": \"ai-assistant\",\n      \"description\": \"In-product AI assistant\",\n      \"globalEnabled\": true,\n      \"state\": \"ACTIVE\",\n      \"version\": 0,\n      \"createdBy\": \"seed\",\n      \"createdAt\": \"2026-10-08T08:47:23.380906Z\",\n      \"updatedBy\": \"seed\",\n      \"updatedAt\": \"2026-10-08T08:47:23.380906Z\"\n    },\n    {\n      \"id\": 1,\n      \"name\": \"beta-dashboard\",\n      \"description\": \"Beta dashboard experience\",\n      \"globalEnabled\": true,\n      \"state\": \"ACTIVE\",\n      \"version\": 0,\n      \"createdBy\": \"seed\",\n      \"createdAt\": \"2026-10-08T08:47:23.380906Z\",\n      \"updatedBy\": \"seed\",\n      \"updatedAt\": \"2026-10-08T08:47:23.380906Z\"\n    },\n    {\n      \"id\": 4,\n      \"name\": \"mobile-push\",\n      \"description\": \"Mobile push notifications\",\n      \"globalEnabled\": false,\n      \"state\": \"DRAFT\",\n      \"version\": 0,\n      \"createdBy\": \"seed\",\n      \"createdAt\": \"2026-10-08T08:47:23.380906Z\",\n      \"updatedBy\": \"seed\",\n      \"updatedAt\": \"2026-10-08T08:47:23.380906Z\"\n    },\n    {\n      \"id\": 2,\n      \"name\": \"new-billing\",\n      \"description\": \"New billing checkout flow\",\n      \"globalEnabled\": false,\n      \"state\": \"ACTIVE\",\n      \"version\": 0,\n      \"createdBy\": \"seed\",\n      \"createdAt\": \"2026-10-08T08:47:23.380906Z\",\n      \"updatedBy\": \"seed\",\n      \"updatedAt\": \"2026-10-08T08:47:23.380906Z\"\n    },\n    {\n      \"id\": 5,\n      \"name\": \"referral-bonus\",\n      \"description\": \"Referral bonus campaign\",\n      \"globalEnabled\": true,\n      \"state\": \"ACTIVE\",\n      \"version\": 0,\n      \"createdBy\": \"seed\",\n      \"createdAt\": \"2026-10-08T08:47:23.380906Z\",\n      \"updatedBy\": \"seed\",\n      \"updatedAt\": \"2026-10-08T08:47:23.380906Z\"\n    }\n  ],\n  \"empty\": false,\n  \"first\": true,\n  \"last\": true,\n  \"number\": 0,\n  \"numberOfElements\": 5,\n  \"pageable\": {\n    \"offset\": 0,\n    \"pageNumber\": 0,\n    \"pageSize\": 20,\n    \"paged\": true,\n    \"sort\": {\n      \"empty\": false,\n      \"sorted\": true,\n      \"unsorted\": false\n    },\n    \"unpaged\": false\n  },\n  \"size\": 20,\n  \"sort\": {\n    \"empty\": false,\n    \"sorted\": true,\n    \"unsorted\": false\n  },\n  \"totalElements\": 5,\n  \"totalPages\": 1\n}"
+      }
+    },
+    {
+      "name": "Get seeded flag beta-dashboard",
+      "category": "Flags",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 69.2,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/v1/flags/beta-dashboard",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json",
+          "Content-Length": "246",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "id": 1,
+          "name": "beta-dashboard",
+          "description": "Beta dashboard experience",
+          "globalEnabled": true,
+          "state": "ACTIVE",
+          "version": 0,
+          "createdBy": "seed",
+          "createdAt": "2026-10-08T08:47:23.380906Z",
+          "updatedBy": "seed",
+          "updatedAt": "2026-10-08T08:47:23.380906Z"
+        },
+        "body_raw": "{\n  \"id\": 1,\n  \"name\": \"beta-dashboard\",\n  \"description\": \"Beta dashboard experience\",\n  \"globalEnabled\": true,\n  \"state\": \"ACTIVE\",\n  \"version\": 0,\n  \"createdBy\": \"seed\",\n  \"createdAt\": \"2026-10-08T08:47:23.380906Z\",\n  \"updatedBy\": \"seed\",\n  \"updatedAt\": \"2026-10-08T08:47:23.380906Z\"\n}"
+      }
+    },
+    {
+      "name": "Get unknown flag \u2192 404",
+      "category": "Flags",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 8.34,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/v1/flags/does-not-exist-zzz",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 404,
+        "headers": {
+          "Content-Type": "application/json",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "timestamp": "2026-10-08T08:56:00.130710458Z",
+          "status": 404,
+          "error": "Not Found",
+          "message": "Feature flag not found: does-not-exist-zzz",
+          "path": "/api/v1/flags/does-not-exist-zzz"
+        },
+        "body_raw": "{\n  \"timestamp\": \"2026-10-08T08:56:00.130710458Z\",\n  \"status\": 404,\n  \"error\": \"Not Found\",\n  \"message\": \"Feature flag not found: does-not-exist-zzz\",\n  \"path\": \"/api/v1/flags/does-not-exist-zzz\"\n}"
+      }
+    },
+    {
+      "name": "Get invalid flag name (URL-encoded) \u2192 400",
+      "category": "Flags",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": null,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/v1/flags/Invalid%20Name%21",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 400,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "timestamp": "2026-10-08T09:03:58.332485129Z",
+          "status": 400,
+          "error": "Bad Request",
+          "message": "get.name: must match \"^[a-z0-9]+(?:[_-][a-z0-9]+)*$\"",
+          "path": "/api/v1/flags/Invalid%20Name%21"
+        },
+        "body_raw": "{\n  \"timestamp\": \"2026-10-08T09:03:58.332485129Z\",\n  \"status\": 400,\n  \"error\": \"Bad Request\",\n  \"message\": \"get.name: must match \\\"^[a-z0-9]+(?:[_-][a-z0-9]+)*$\\\"\",\n  \"path\": \"/api/v1/flags/Invalid%20Name%21\"\n}"
+      }
+    },
+    {
+      "name": "Create flag",
+      "category": "Flags",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 237.91,
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:8080/api/v1/flags",
+        "headers": {
+          "Accept": "application/json",
+          "X-Actor-Id": "api-tester",
+          "Idempotency-Key": "idem-9b6dc2f92b68",
+          "X-Request-Id": "req-73530f01",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "name": "api-test-412810eb",
+          "description": "API test flag created by automated suite",
+          "globalEnabled": false,
+          "state": "ACTIVE"
+        },
+        "body_raw": "{\n  \"name\": \"api-test-412810eb\",\n  \"description\": \"API test flag created by automated suite\",\n  \"globalEnabled\": false,\n  \"state\": \"ACTIVE\"\n}"
+      },
+      "response": {
+        "status": 201,
+        "headers": {
+          "Content-Type": "application/json",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "id": 6,
+          "name": "api-test-412810eb",
+          "description": "API test flag created by automated suite",
+          "globalEnabled": false,
+          "state": "ACTIVE",
+          "version": 0,
+          "createdBy": "api-tester",
+          "createdAt": "2026-10-08T08:56:00.216440636Z",
+          "updatedBy": "api-tester",
+          "updatedAt": "2026-10-08T08:56:00.216440636Z"
+        },
+        "body_raw": "{\n  \"id\": 6,\n  \"name\": \"api-test-412810eb\",\n  \"description\": \"API test flag created by automated suite\",\n  \"globalEnabled\": false,\n  \"state\": \"ACTIVE\",\n  \"version\": 0,\n  \"createdBy\": \"api-tester\",\n  \"createdAt\": \"2026-10-08T08:56:00.216440636Z\",\n  \"updatedBy\": \"api-tester\",\n  \"updatedAt\": \"2026-10-08T08:56:00.216440636Z\"\n}"
+      }
+    },
+    {
+      "name": "Create flag idempotent replay \u2192 200",
+      "category": "Flags",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 30.88,
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:8080/api/v1/flags",
+        "headers": {
+          "Accept": "application/json",
+          "X-Actor-Id": "api-tester",
+          "Idempotency-Key": "idem-9b6dc2f92b68",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "name": "api-test-412810eb",
+          "description": "API test flag created by automated suite",
+          "globalEnabled": false,
+          "state": "ACTIVE"
+        },
+        "body_raw": "{\n  \"name\": \"api-test-412810eb\",\n  \"description\": \"API test flag created by automated suite\",\n  \"globalEnabled\": false,\n  \"state\": \"ACTIVE\"\n}"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "id": 6,
+          "name": "api-test-412810eb",
+          "description": "API test flag created by automated suite",
+          "globalEnabled": false,
+          "state": "ACTIVE",
+          "version": 0,
+          "createdBy": "api-tester",
+          "createdAt": "2026-10-08T08:56:00.216441Z",
+          "updatedBy": "api-tester",
+          "updatedAt": "2026-10-08T08:56:00.216441Z"
+        },
+        "body_raw": "{\n  \"id\": 6,\n  \"name\": \"api-test-412810eb\",\n  \"description\": \"API test flag created by automated suite\",\n  \"globalEnabled\": false,\n  \"state\": \"ACTIVE\",\n  \"version\": 0,\n  \"createdBy\": \"api-tester\",\n  \"createdAt\": \"2026-10-08T08:56:00.216441Z\",\n  \"updatedBy\": \"api-tester\",\n  \"updatedAt\": \"2026-10-08T08:56:00.216441Z\"\n}"
+      }
+    },
+    {
+      "name": "Create duplicate flag name \u2192 409",
+      "category": "Flags",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 7.22,
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:8080/api/v1/flags",
+        "headers": {
+          "Accept": "application/json",
+          "X-Actor-Id": "api-tester",
+          "Idempotency-Key": "other-8794dd95",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "name": "api-test-412810eb",
+          "description": "dup",
+          "globalEnabled": false,
+          "state": "ACTIVE"
+        },
+        "body_raw": "{\n  \"name\": \"api-test-412810eb\",\n  \"description\": \"dup\",\n  \"globalEnabled\": false,\n  \"state\": \"ACTIVE\"\n}"
+      },
+      "response": {
+        "status": 409,
+        "headers": {
+          "Content-Type": "application/json",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "timestamp": "2026-10-08T08:56:00.407379953Z",
+          "status": 409,
+          "error": "Conflict",
+          "message": "Feature flag already exists: api-test-412810eb",
+          "path": "/api/v1/flags"
+        },
+        "body_raw": "{\n  \"timestamp\": \"2026-10-08T08:56:00.407379953Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"message\": \"Feature flag already exists: api-test-412810eb\",\n  \"path\": \"/api/v1/flags\"\n}"
+      }
+    },
+    {
+      "name": "Create flag missing globalEnabled \u2192 400",
+      "category": "Flags",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 13.73,
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:8080/api/v1/flags",
+        "headers": {
+          "Accept": "application/json",
+          "X-Actor-Id": "api-tester",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "name": "bad-flag-missing-enabled"
+        },
+        "body_raw": "{\n  \"name\": \"bad-flag-missing-enabled\"\n}"
+      },
+      "response": {
+        "status": 400,
+        "headers": {
+          "Content-Type": "application/json",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "timestamp": "2026-10-08T08:56:00.420106705Z",
+          "status": 400,
+          "error": "Bad Request",
+          "message": "globalEnabled: must not be null",
+          "path": "/api/v1/flags"
+        },
+        "body_raw": "{\n  \"timestamp\": \"2026-10-08T08:56:00.420106705Z\",\n  \"status\": 400,\n  \"error\": \"Bad Request\",\n  \"message\": \"globalEnabled: must not be null\",\n  \"path\": \"/api/v1/flags\"\n}"
+      }
+    },
+    {
+      "name": "Get created flag api-test-412810eb",
+      "category": "Flags",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 4.55,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/v1/flags/api-test-412810eb",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json",
+          "Content-Length": "277",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "id": 6,
+          "name": "api-test-412810eb",
+          "description": "API test flag created by automated suite",
+          "globalEnabled": false,
+          "state": "ACTIVE",
+          "version": 0,
+          "createdBy": "api-tester",
+          "createdAt": "2026-10-08T08:56:00.216441Z",
+          "updatedBy": "api-tester",
+          "updatedAt": "2026-10-08T08:56:00.216441Z"
+        },
+        "body_raw": "{\n  \"id\": 6,\n  \"name\": \"api-test-412810eb\",\n  \"description\": \"API test flag created by automated suite\",\n  \"globalEnabled\": false,\n  \"state\": \"ACTIVE\",\n  \"version\": 0,\n  \"createdBy\": \"api-tester\",\n  \"createdAt\": \"2026-10-08T08:56:00.216441Z\",\n  \"updatedBy\": \"api-tester\",\n  \"updatedAt\": \"2026-10-08T08:56:00.216441Z\"\n}"
+      }
+    },
+    {
+      "name": "Patch flag (enable + description)",
+      "category": "Flags",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 26.55,
+      "request": {
+        "method": "PATCH",
+        "url": "http://localhost:8080/api/v1/flags/api-test-412810eb",
+        "headers": {
+          "Accept": "application/json",
+          "X-Actor-Id": "api-tester",
+          "X-Request-Id": "patch-1",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "globalEnabled": true,
+          "description": "Updated by API test suite",
+          "state": "ACTIVE"
+        },
+        "body_raw": "{\n  \"globalEnabled\": true,\n  \"description\": \"Updated by API test suite\",\n  \"state\": \"ACTIVE\"\n}"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json",
+          "Content-Length": "264",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "id": 6,
+          "name": "api-test-412810eb",
+          "description": "Updated by API test suite",
+          "globalEnabled": true,
+          "state": "ACTIVE",
+          "version": 1,
+          "createdBy": "api-tester",
+          "createdAt": "2026-10-08T08:56:00.216441Z",
+          "updatedBy": "api-tester",
+          "updatedAt": "2026-10-08T08:56:00.435921124Z"
+        },
+        "body_raw": "{\n  \"id\": 6,\n  \"name\": \"api-test-412810eb\",\n  \"description\": \"Updated by API test suite\",\n  \"globalEnabled\": true,\n  \"state\": \"ACTIVE\",\n  \"version\": 1,\n  \"createdBy\": \"api-tester\",\n  \"createdAt\": \"2026-10-08T08:56:00.216441Z\",\n  \"updatedBy\": \"api-tester\",\n  \"updatedAt\": \"2026-10-08T08:56:00.435921124Z\"\n}"
+      }
+    },
+    {
+      "name": "Patch unknown flag \u2192 404",
+      "category": "Flags",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 5.85,
+      "request": {
+        "method": "PATCH",
+        "url": "http://localhost:8080/api/v1/flags/no-such-flag-xyz",
+        "headers": {
+          "Accept": "application/json",
+          "X-Actor-Id": "api-tester",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "globalEnabled": true
+        },
+        "body_raw": "{\n  \"globalEnabled\": true\n}"
+      },
+      "response": {
+        "status": 404,
+        "headers": {
+          "Content-Type": "application/json",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "timestamp": "2026-10-08T08:56:00.458460085Z",
+          "status": 404,
+          "error": "Not Found",
+          "message": "Feature flag not found: no-such-flag-xyz",
+          "path": "/api/v1/flags/no-such-flag-xyz"
+        },
+        "body_raw": "{\n  \"timestamp\": \"2026-10-08T08:56:00.458460085Z\",\n  \"status\": 404,\n  \"error\": \"Not Found\",\n  \"message\": \"Feature flag not found: no-such-flag-xyz\",\n  \"path\": \"/api/v1/flags/no-such-flag-xyz\"\n}"
+      }
+    },
+    {
+      "name": "Evaluate GLOBAL (no override, global true)",
+      "category": "Evaluations",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 23.88,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/v1/evaluations/api-test-412810eb?userId=test-user-api",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json",
+          "Content-Length": "86",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "flag": "api-test-412810eb",
+          "userId": "test-user-api",
+          "enabled": true,
+          "reason": "GLOBAL"
+        },
+        "body_raw": "{\n  \"flag\": \"api-test-412810eb\",\n  \"userId\": \"test-user-api\",\n  \"enabled\": true,\n  \"reason\": \"GLOBAL\"\n}"
+      }
+    },
+    {
+      "name": "Evaluate seeded beta-dashboard GLOBAL for stranger",
+      "category": "Evaluations",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 10.31,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/v1/evaluations/beta-dashboard?userId=stranger-999",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json",
+          "Content-Length": "82",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "flag": "beta-dashboard",
+          "userId": "stranger-999",
+          "enabled": true,
+          "reason": "GLOBAL"
+        },
+        "body_raw": "{\n  \"flag\": \"beta-dashboard\",\n  \"userId\": \"stranger-999\",\n  \"enabled\": true,\n  \"reason\": \"GLOBAL\"\n}"
+      }
+    },
+    {
+      "name": "Evaluate seeded beta-dashboard USER_OVERRIDE user-001",
+      "category": "Evaluations",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 11.8,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/v1/evaluations/beta-dashboard?userId=user-001",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json",
+          "Content-Length": "86",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "flag": "beta-dashboard",
+          "userId": "user-001",
+          "enabled": false,
+          "reason": "USER_OVERRIDE"
+        },
+        "body_raw": "{\n  \"flag\": \"beta-dashboard\",\n  \"userId\": \"user-001\",\n  \"enabled\": false,\n  \"reason\": \"USER_OVERRIDE\"\n}"
+      }
+    },
+    {
+      "name": "Evaluate seeded beta-dashboard USER_OVERRIDE user-002",
+      "category": "Evaluations",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 9.0,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/v1/evaluations/beta-dashboard?userId=user-002",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json",
+          "Content-Length": "85",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "flag": "beta-dashboard",
+          "userId": "user-002",
+          "enabled": true,
+          "reason": "USER_OVERRIDE"
+        },
+        "body_raw": "{\n  \"flag\": \"beta-dashboard\",\n  \"userId\": \"user-002\",\n  \"enabled\": true,\n  \"reason\": \"USER_OVERRIDE\"\n}"
+      }
+    },
+    {
+      "name": "Evaluate seeded new-billing GLOBAL false",
+      "category": "Evaluations",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 9.53,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/v1/evaluations/new-billing?userId=stranger-999",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json",
+          "Content-Length": "80",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "flag": "new-billing",
+          "userId": "stranger-999",
+          "enabled": false,
+          "reason": "GLOBAL"
+        },
+        "body_raw": "{\n  \"flag\": \"new-billing\",\n  \"userId\": \"stranger-999\",\n  \"enabled\": false,\n  \"reason\": \"GLOBAL\"\n}"
+      }
+    },
+    {
+      "name": "Evaluate missing userId \u2192 400",
+      "category": "Evaluations",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 4.15,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/v1/evaluations/api-test-412810eb",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 400,
+        "headers": {
+          "Content-Type": "application/json",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "timestamp": "2026-10-08T08:56:00.527647428Z",
+          "status": 400,
+          "error": "Bad Request",
+          "message": "Required request parameter 'userId' for method parameter type String is not present",
+          "path": "/api/v1/evaluations/api-test-412810eb"
+        },
+        "body_raw": "{\n  \"timestamp\": \"2026-10-08T08:56:00.527647428Z\",\n  \"status\": 400,\n  \"error\": \"Bad Request\",\n  \"message\": \"Required request parameter 'userId' for method parameter type String is not present\",\n  \"path\": \"/api/v1/evaluations/api-test-412810eb\"\n}"
+      }
+    },
+    {
+      "name": "Evaluate unknown flag \u2192 404",
+      "category": "Evaluations",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 7.03,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/v1/evaluations/unknown-flag-zzz?userId=u1",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 404,
+        "headers": {
+          "Content-Type": "application/json",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "timestamp": "2026-10-08T08:56:00.535192220Z",
+          "status": 404,
+          "error": "Not Found",
+          "message": "Feature flag not found: unknown-flag-zzz",
+          "path": "/api/v1/evaluations/unknown-flag-zzz"
+        },
+        "body_raw": "{\n  \"timestamp\": \"2026-10-08T08:56:00.535192220Z\",\n  \"status\": 404,\n  \"error\": \"Not Found\",\n  \"message\": \"Feature flag not found: unknown-flag-zzz\",\n  \"path\": \"/api/v1/evaluations/unknown-flag-zzz\"\n}"
+      }
+    },
+    {
+      "name": "Upsert override enabled=false",
+      "category": "Overrides",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 23.85,
+      "request": {
+        "method": "PUT",
+        "url": "http://localhost:8080/api/v1/flags/api-test-412810eb/overrides/test-user-api",
+        "headers": {
+          "Accept": "application/json",
+          "X-Actor-Id": "api-tester",
+          "X-Request-Id": "ovr-1",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "enabled": false
+        },
+        "body_raw": "{\n  \"enabled\": false\n}"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json",
+          "Content-Length": "154",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "flagId": 6,
+          "flagName": "api-test-412810eb",
+          "userId": "test-user-api",
+          "enabled": false,
+          "updatedBy": "api-tester",
+          "updatedAt": "2026-10-08T08:56:00.549061764Z"
+        },
+        "body_raw": "{\n  \"flagId\": 6,\n  \"flagName\": \"api-test-412810eb\",\n  \"userId\": \"test-user-api\",\n  \"enabled\": false,\n  \"updatedBy\": \"api-tester\",\n  \"updatedAt\": \"2026-10-08T08:56:00.549061764Z\"\n}"
+      }
+    },
+    {
+      "name": "Evaluate after override \u2192 USER_OVERRIDE false",
+      "category": "Evaluations",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 5.02,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/v1/evaluations/api-test-412810eb?userId=test-user-api",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json",
+          "Content-Length": "94",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "flag": "api-test-412810eb",
+          "userId": "test-user-api",
+          "enabled": false,
+          "reason": "USER_OVERRIDE"
+        },
+        "body_raw": "{\n  \"flag\": \"api-test-412810eb\",\n  \"userId\": \"test-user-api\",\n  \"enabled\": false,\n  \"reason\": \"USER_OVERRIDE\"\n}"
+      }
+    },
+    {
+      "name": "Upsert override enabled=true",
+      "category": "Overrides",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 12.15,
+      "request": {
+        "method": "PUT",
+        "url": "http://localhost:8080/api/v1/flags/api-test-412810eb/overrides/test-user-api",
+        "headers": {
+          "Accept": "application/json",
+          "X-Actor-Id": "api-tester",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "enabled": true
+        },
+        "body_raw": "{\n  \"enabled\": true\n}"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json",
+          "Content-Length": "153",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "flagId": 6,
+          "flagName": "api-test-412810eb",
+          "userId": "test-user-api",
+          "enabled": true,
+          "updatedBy": "api-tester",
+          "updatedAt": "2026-10-08T08:56:00.570018433Z"
+        },
+        "body_raw": "{\n  \"flagId\": 6,\n  \"flagName\": \"api-test-412810eb\",\n  \"userId\": \"test-user-api\",\n  \"enabled\": true,\n  \"updatedBy\": \"api-tester\",\n  \"updatedAt\": \"2026-10-08T08:56:00.570018433Z\"\n}"
+      }
+    },
+    {
+      "name": "Evaluate after override flip \u2192 USER_OVERRIDE true",
+      "category": "Evaluations",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 4.69,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/v1/evaluations/api-test-412810eb?userId=test-user-api",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json",
+          "Content-Length": "93",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "flag": "api-test-412810eb",
+          "userId": "test-user-api",
+          "enabled": true,
+          "reason": "USER_OVERRIDE"
+        },
+        "body_raw": "{\n  \"flag\": \"api-test-412810eb\",\n  \"userId\": \"test-user-api\",\n  \"enabled\": true,\n  \"reason\": \"USER_OVERRIDE\"\n}"
+      }
+    },
+    {
+      "name": "Upsert override for other user",
+      "category": "Overrides",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 11.8,
+      "request": {
+        "method": "PUT",
+        "url": "http://localhost:8080/api/v1/flags/api-test-412810eb/overrides/other-user",
+        "headers": {
+          "Accept": "application/json",
+          "X-Actor-Id": "api-tester",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "enabled": false
+        },
+        "body_raw": "{\n  \"enabled\": false\n}"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json",
+          "Content-Length": "151",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "flagId": 6,
+          "flagName": "api-test-412810eb",
+          "userId": "other-user",
+          "enabled": false,
+          "updatedBy": "api-tester",
+          "updatedAt": "2026-10-08T08:56:00.587891144Z"
+        },
+        "body_raw": "{\n  \"flagId\": 6,\n  \"flagName\": \"api-test-412810eb\",\n  \"userId\": \"other-user\",\n  \"enabled\": false,\n  \"updatedBy\": \"api-tester\",\n  \"updatedAt\": \"2026-10-08T08:56:00.587891144Z\"\n}"
+      }
+    },
+    {
+      "name": "List overrides",
+      "category": "Overrides",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 13.95,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/v1/flags/api-test-412810eb/overrides?page=0&size=20",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json",
+          "Content-Length": "617",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "content": [
+            {
+              "flagId": 6,
+              "flagName": "api-test-412810eb",
+              "userId": "other-user",
+              "enabled": false,
+              "updatedBy": "api-tester",
+              "updatedAt": "2026-10-08T08:56:00.587891Z"
+            },
+            {
+              "flagId": 6,
+              "flagName": "api-test-412810eb",
+              "userId": "test-user-api",
+              "enabled": true,
+              "updatedBy": "api-tester",
+              "updatedAt": "2026-10-08T08:56:00.570018Z"
+            }
+          ],
+          "empty": false,
+          "first": true,
+          "last": true,
+          "number": 0,
+          "numberOfElements": 2,
+          "pageable": {
+            "offset": 0,
+            "pageNumber": 0,
+            "pageSize": 20,
+            "paged": true,
+            "sort": {
+              "empty": false,
+              "sorted": true,
+              "unsorted": false
+            },
+            "unpaged": false
+          },
+          "size": 20,
+          "sort": {
+            "empty": false,
+            "sorted": true,
+            "unsorted": false
+          },
+          "totalElements": 2,
+          "totalPages": 1
+        },
+        "body_raw": "{\n  \"content\": [\n    {\n      \"flagId\": 6,\n      \"flagName\": \"api-test-412810eb\",\n      \"userId\": \"other-user\",\n      \"enabled\": false,\n      \"updatedBy\": \"api-tester\",\n      \"updatedAt\": \"2026-10-08T08:56:00.587891Z\"\n    },\n    {\n      \"flagId\": 6,\n      \"flagName\": \"api-test-412810eb\",\n      \"userId\": \"test-user-api\",\n      \"enabled\": true,\n      \"updatedBy\": \"api-tester\",\n      \"updatedAt\": \"2026-10-08T08:56:00.570018Z\"\n    }\n  ],\n  \"empty\": false,\n  \"first\": true,\n  \"last\": true,\n  \"number\": 0,\n  \"numberOfElements\": 2,\n  \"pageable\": {\n    \"offset\": 0,\n    \"pageNumber\": 0,\n    \"pageSize\": 20,\n    \"paged\": true,\n    \"sort\": {\n      \"empty\": false,\n      \"sorted\": true,\n      \"unsorted\": false\n    },\n    \"unpaged\": false\n  },\n  \"size\": 20,\n  \"sort\": {\n    \"empty\": false,\n    \"sorted\": true,\n    \"unsorted\": false\n  },\n  \"totalElements\": 2,\n  \"totalPages\": 1\n}"
+      }
+    },
+    {
+      "name": "List overrides for unknown flag \u2192 404",
+      "category": "Overrides",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 4.97,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/v1/flags/no-such-flag/overrides",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 404,
+        "headers": {
+          "Content-Type": "application/json",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "timestamp": "2026-10-08T08:56:00.611964314Z",
+          "status": 404,
+          "error": "Not Found",
+          "message": "Feature flag not found: no-such-flag",
+          "path": "/api/v1/flags/no-such-flag/overrides"
+        },
+        "body_raw": "{\n  \"timestamp\": \"2026-10-08T08:56:00.611964314Z\",\n  \"status\": 404,\n  \"error\": \"Not Found\",\n  \"message\": \"Feature flag not found: no-such-flag\",\n  \"path\": \"/api/v1/flags/no-such-flag/overrides\"\n}"
+      }
+    },
+    {
+      "name": "Remove override (INHERIT tombstone)",
+      "category": "Overrides",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 13.58,
+      "request": {
+        "method": "DELETE",
+        "url": "http://localhost:8080/api/v1/flags/api-test-412810eb/overrides/test-user-api",
+        "headers": {
+          "Accept": "application/json",
+          "X-Actor-Id": "api-tester",
+          "X-Request-Id": "del-ovr"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 204,
+        "headers": {
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": null,
+        "body_raw": null
+      }
+    },
+    {
+      "name": "Evaluate after remove override \u2192 GLOBAL",
+      "category": "Evaluations",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 5.38,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/v1/evaluations/api-test-412810eb?userId=test-user-api",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json",
+          "Content-Length": "86",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "flag": "api-test-412810eb",
+          "userId": "test-user-api",
+          "enabled": true,
+          "reason": "GLOBAL"
+        },
+        "body_raw": "{\n  \"flag\": \"api-test-412810eb\",\n  \"userId\": \"test-user-api\",\n  \"enabled\": true,\n  \"reason\": \"GLOBAL\"\n}"
+      }
+    },
+    {
+      "name": "List overrides after one removed",
+      "category": "Overrides",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 5.86,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/v1/flags/api-test-412810eb/overrides",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json",
+          "Content-Length": "466",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "content": [
+            {
+              "flagId": 6,
+              "flagName": "api-test-412810eb",
+              "userId": "other-user",
+              "enabled": false,
+              "updatedBy": "api-tester",
+              "updatedAt": "2026-10-08T08:56:00.587891Z"
+            }
+          ],
+          "empty": false,
+          "first": true,
+          "last": true,
+          "number": 0,
+          "numberOfElements": 1,
+          "pageable": {
+            "offset": 0,
+            "pageNumber": 0,
+            "pageSize": 20,
+            "paged": true,
+            "sort": {
+              "empty": false,
+              "sorted": true,
+              "unsorted": false
+            },
+            "unpaged": false
+          },
+          "size": 20,
+          "sort": {
+            "empty": false,
+            "sorted": true,
+            "unsorted": false
+          },
+          "totalElements": 1,
+          "totalPages": 1
+        },
+        "body_raw": "{\n  \"content\": [\n    {\n      \"flagId\": 6,\n      \"flagName\": \"api-test-412810eb\",\n      \"userId\": \"other-user\",\n      \"enabled\": false,\n      \"updatedBy\": \"api-tester\",\n      \"updatedAt\": \"2026-10-08T08:56:00.587891Z\"\n    }\n  ],\n  \"empty\": false,\n  \"first\": true,\n  \"last\": true,\n  \"number\": 0,\n  \"numberOfElements\": 1,\n  \"pageable\": {\n    \"offset\": 0,\n    \"pageNumber\": 0,\n    \"pageSize\": 20,\n    \"paged\": true,\n    \"sort\": {\n      \"empty\": false,\n      \"sorted\": true,\n      \"unsorted\": false\n    },\n    \"unpaged\": false\n  },\n  \"size\": 20,\n  \"sort\": {\n    \"empty\": false,\n    \"sorted\": true,\n    \"unsorted\": false\n  },\n  \"totalElements\": 1,\n  \"totalPages\": 1\n}"
+      }
+    },
+    {
+      "name": "Remove override unknown flag \u2192 404",
+      "category": "Overrides",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 5.54,
+      "request": {
+        "method": "DELETE",
+        "url": "http://localhost:8080/api/v1/flags/no-such-flag/overrides/u1",
+        "headers": {
+          "Accept": "application/json",
+          "X-Actor-Id": "api-tester"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 404,
+        "headers": {
+          "Content-Type": "application/json",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "timestamp": "2026-10-08T08:56:00.641842360Z",
+          "status": 404,
+          "error": "Not Found",
+          "message": "Feature flag not found: no-such-flag",
+          "path": "/api/v1/flags/no-such-flag/overrides/u1"
+        },
+        "body_raw": "{\n  \"timestamp\": \"2026-10-08T08:56:00.641842360Z\",\n  \"status\": 404,\n  \"error\": \"Not Found\",\n  \"message\": \"Feature flag not found: no-such-flag\",\n  \"path\": \"/api/v1/flags/no-such-flag/overrides/u1\"\n}"
+      }
+    },
+    {
+      "name": "List audits for test flag",
+      "category": "Audits",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 15.74,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/v1/flags/api-test-412810eb/audits?page=0&size=50&sort=createdAt,desc",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json",
+          "Content-Length": "1993",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "content": [
+            {
+              "id": 6,
+              "flagId": 6,
+              "action": "OVERRIDE_REMOVED",
+              "actorId": "api-tester",
+              "changeMap": {
+                "userId": {
+                  "new": "test-user-api",
+                  "previous": null
+                },
+                "enabled": {
+                  "new": null,
+                  "previous": true
+                }
+              },
+              "requestId": "del-ovr",
+              "createdAt": "2026-10-08T08:56:00.620201Z"
+            },
+            {
+              "id": 5,
+              "flagId": 6,
+              "action": "OVERRIDE_UPSERTED",
+              "actorId": "api-tester",
+              "changeMap": {
+                "userId": {
+                  "new": "other-user",
+                  "previous": null
+                },
+                "enabled": {
+                  "new": false,
+                  "previous": null
+                }
+              },
+              "requestId": "5fb6c815-45da-4e74-9d1c-31825782c3d3",
+              "createdAt": "2026-10-08T08:56:00.588562Z"
+            },
+            {
+              "id": 4,
+              "flagId": 6,
+              "action": "OVERRIDE_UPSERTED",
+              "actorId": "api-tester",
+              "changeMap": {
+                "userId": {
+                  "new": "test-user-api",
+                  "previous": null
+                },
+                "enabled": {
+                  "new": true,
+                  "previous": false
+                }
+              },
+              "requestId": "ddeb8a35-2981-4cbd-abeb-9cc5377c2964",
+              "createdAt": "2026-10-08T08:56:00.570647Z"
+            },
+            {
+              "id": 3,
+              "flagId": 6,
+              "action": "OVERRIDE_UPSERTED",
+              "actorId": "api-tester",
+              "changeMap": {
+                "userId": {
+                  "new": "test-user-api",
+                  "previous": null
+                },
+                "enabled": {
+                  "new": false,
+                  "previous": null
+                }
+              },
+              "requestId": "ovr-1",
+              "createdAt": "2026-10-08T08:56:00.552717Z"
+            },
+            {
+              "id": 2,
+              "flagId": 6,
+              "action": "FLAG_UPDATED",
+              "actorId": "api-tester",
+              "changeMap": {
+                "description": {
+                  "new": "Updated by API test suite",
+                  "previous": "API test flag created by automated suite"
+                },
+                "globalEnabled": {
+                  "new": true,
+                  "previous": false
+                }
+              },
+              "requestId": "patch-1",
+              "createdAt": "2026-10-08T08:56:00.445174Z"
+            },
+            {
+              "id": 1,
+              "flagId": 6,
+              "action": "FLAG_CREATED",
+              "actorId": "api-tester",
+              "changeMap": {
+                "name": {
+                  "new": "api-test-412810eb",
+                  "previous": null
+                },
+                "state": {
+                  "new": "ACTIVE",
+                  "previous": null
+                },
+                "description": {
+                  "new": "API test flag created by automated suite",
+                  "previous": null
+                },
+                "globalEnabled": {
+                  "new": false,
+                  "previous": null
+                }
+              },
+              "requestId": "idem-9b6dc2f92b68",
+              "createdAt": "2026-10-08T08:56:00.240216Z"
+            }
+          ],
+          "empty": false,
+          "first": true,
+          "last": true,
+          "number": 0,
+          "numberOfElements": 6,
+          "pageable": {
+            "offset": 0,
+            "pageNumber": 0,
+            "pageSize": 50,
+            "paged": true,
+            "sort": {
+              "empty": false,
+              "sorted": true,
+              "unsorted": false
+            },
+            "unpaged": false
+          },
+          "size": 50,
+          "sort": {
+            "empty": false,
+            "sorted": true,
+            "unsorted": false
+          },
+          "totalElements": 6,
+          "totalPages": 1
+        },
+        "body_raw": "{\n  \"content\": [\n    {\n      \"id\": 6,\n      \"flagId\": 6,\n      \"action\": \"OVERRIDE_REMOVED\",\n      \"actorId\": \"api-tester\",\n      \"changeMap\": {\n        \"userId\": {\n          \"new\": \"test-user-api\",\n          \"previous\": null\n        },\n        \"enabled\": {\n          \"new\": null,\n          \"previous\": true\n        }\n      },\n      \"requestId\": \"del-ovr\",\n      \"createdAt\": \"2026-10-08T08:56:00.620201Z\"\n    },\n    {\n      \"id\": 5,\n      \"flagId\": 6,\n      \"action\": \"OVERRIDE_UPSERTED\",\n      \"actorId\": \"api-tester\",\n      \"changeMap\": {\n        \"userId\": {\n          \"new\": \"other-user\",\n          \"previous\": null\n        },\n        \"enabled\": {\n          \"new\": false,\n          \"previous\": null\n        }\n      },\n      \"requestId\": \"5fb6c815-45da-4e74-9d1c-31825782c3d3\",\n      \"createdAt\": \"2026-10-08T08:56:00.588562Z\"\n    },\n    {\n      \"id\": 4,\n      \"flagId\": 6,\n      \"action\": \"OVERRIDE_UPSERTED\",\n      \"actorId\": \"api-tester\",\n      \"changeMap\": {\n        \"userId\": {\n          \"new\": \"test-user-api\",\n          \"previous\": null\n        },\n        \"enabled\": {\n          \"new\": true,\n          \"previous\": false\n        }\n      },\n      \"requestId\": \"ddeb8a35-2981-4cbd-abeb-9cc5377c2964\",\n      \"createdAt\": \"2026-10-08T08:56:00.570647Z\"\n    },\n    {\n      \"id\": 3,\n      \"flagId\": 6,\n      \"action\": \"OVERRIDE_UPSERTED\",\n      \"actorId\": \"api-tester\",\n      \"changeMap\": {\n        \"userId\": {\n          \"new\": \"test-user-api\",\n          \"previous\": null\n        },\n        \"enabled\": {\n          \"new\": false,\n          \"previous\": null\n        }\n      },\n      \"requestId\": \"ovr-1\",\n      \"createdAt\": \"2026-10-08T08:56:00.552717Z\"\n    },\n    {\n      \"id\": 2,\n      \"flagId\": 6,\n      \"action\": \"FLAG_UPDATED\",\n      \"actorId\": \"api-tester\",\n      \"changeMap\": {\n        \"description\": {\n          \"new\": \"Updated by API test suite\",\n          \"previous\": \"API test flag created by automated suite\"\n        },\n        \"globalEnabled\": {\n          \"new\": true,\n          \"previous\": false\n        }\n      },\n      \"requestId\": \"patch-1\",\n      \"createdAt\": \"2026-10-08T08:56:00.445174Z\"\n    },\n    {\n      \"id\": 1,\n      \"flagId\": 6,\n      \"action\": \"FLAG_CREATED\",\n      \"actorId\": \"api-tester\",\n      \"changeMap\": {\n        \"name\": {\n          \"new\": \"api-test-412810eb\",\n          \"previous\": null\n        },\n        \"state\": {\n          \"new\": \"ACTIVE\",\n          \"previous\": null\n        },\n        \"description\": {\n          \"new\": \"API test flag created by automated suite\",\n          \"previous\": null\n        },\n        \"globalEnabled\": {\n          \"new\": false,\n          \"previous\": null\n        }\n      },\n      \"requestId\": \"idem-9b6dc2f92b68\",\n      \"createdAt\": \"2026-10-08T08:56:00.240216Z\"\n    }\n  ],\n  \"empty\": false,\n  \"first\": true,\n  \"last\": true,\n  \"number\": 0,\n  \"numberOfElements\": 6,\n  \"pageable\": {\n    \"offset\": 0,\n    \"pageNumber\": 0,\n    \"pageSize\": 50,\n    \"paged\": true,\n    \"sort\": {\n      \"empty\": false,\n      \"sorted\": true,\n      \"unsorted\": false\n    },\n    \"unpaged\": false\n  },\n  \"size\": 50,\n  \"sort\": {\n    \"empty\": false,\n    \"sorted\": true,\n    \"unsorted\": false\n  },\n  \"totalElements\": 6,\n  \"totalPages\": 1\n}"
+      }
+    },
+    {
+      "name": "List audits for seeded flag",
+      "category": "Audits",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 5.93,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/v1/flags/beta-dashboard/audits?page=0&size=10",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json",
+          "Content-Length": "317",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "content": [],
+          "empty": true,
+          "first": true,
+          "last": true,
+          "number": 0,
+          "numberOfElements": 0,
+          "pageable": {
+            "offset": 0,
+            "pageNumber": 0,
+            "pageSize": 10,
+            "paged": true,
+            "sort": {
+              "empty": false,
+              "sorted": true,
+              "unsorted": false
+            },
+            "unpaged": false
+          },
+          "size": 10,
+          "sort": {
+            "empty": false,
+            "sorted": true,
+            "unsorted": false
+          },
+          "totalElements": 0,
+          "totalPages": 0
+        },
+        "body_raw": "{\n  \"content\": [],\n  \"empty\": true,\n  \"first\": true,\n  \"last\": true,\n  \"number\": 0,\n  \"numberOfElements\": 0,\n  \"pageable\": {\n    \"offset\": 0,\n    \"pageNumber\": 0,\n    \"pageSize\": 10,\n    \"paged\": true,\n    \"sort\": {\n      \"empty\": false,\n      \"sorted\": true,\n      \"unsorted\": false\n    },\n    \"unpaged\": false\n  },\n  \"size\": 10,\n  \"sort\": {\n    \"empty\": false,\n    \"sorted\": true,\n    \"unsorted\": false\n  },\n  \"totalElements\": 0,\n  \"totalPages\": 0\n}"
+      }
+    },
+    {
+      "name": "List audits unknown flag \u2192 404",
+      "category": "Audits",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 4.93,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/v1/flags/no-such-flag/audits",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 404,
+        "headers": {
+          "Content-Type": "application/json",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "timestamp": "2026-10-08T08:56:00.669713239Z",
+          "status": 404,
+          "error": "Not Found",
+          "message": "Feature flag not found: no-such-flag",
+          "path": "/api/v1/flags/no-such-flag/audits"
+        },
+        "body_raw": "{\n  \"timestamp\": \"2026-10-08T08:56:00.669713239Z\",\n  \"status\": 404,\n  \"error\": \"Not Found\",\n  \"message\": \"Feature flag not found: no-such-flag\",\n  \"path\": \"/api/v1/flags/no-such-flag/audits\"\n}"
+      }
+    },
+    {
+      "name": "Evaluate cache warm #1",
+      "category": "Cache",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 3.84,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/v1/evaluations/api-test-412810eb?userId=test-user-api",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json",
+          "Content-Length": "86",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "flag": "api-test-412810eb",
+          "userId": "test-user-api",
+          "enabled": true,
+          "reason": "GLOBAL"
+        },
+        "body_raw": "{\n  \"flag\": \"api-test-412810eb\",\n  \"userId\": \"test-user-api\",\n  \"enabled\": true,\n  \"reason\": \"GLOBAL\"\n}"
+      }
+    },
+    {
+      "name": "Evaluate cache warm #2 (should be fast)",
+      "category": "Cache",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 4.81,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/v1/evaluations/api-test-412810eb?userId=test-user-api",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json",
+          "Content-Length": "86",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "flag": "api-test-412810eb",
+          "userId": "test-user-api",
+          "enabled": true,
+          "reason": "GLOBAL"
+        },
+        "body_raw": "{\n  \"flag\": \"api-test-412810eb\",\n  \"userId\": \"test-user-api\",\n  \"enabled\": true,\n  \"reason\": \"GLOBAL\"\n}"
+      }
+    },
+    {
+      "name": "Cache hits metric",
+      "category": "Ops",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 12.44,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/actuator/metrics/fms.cache.hits",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json",
+          "Content-Length": "190",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "availableTags": [
+            {
+              "tag": "application",
+              "values": [
+                "feature-management-service"
+              ]
+            }
+          ],
+          "description": "Redis cache hits",
+          "measurements": [
+            {
+              "statistic": "COUNT",
+              "value": 13.0
+            }
+          ],
+          "name": "fms.cache.hits"
+        },
+        "body_raw": "{\n  \"availableTags\": [\n    {\n      \"tag\": \"application\",\n      \"values\": [\n        \"feature-management-service\"\n      ]\n    }\n  ],\n  \"description\": \"Redis cache hits\",\n  \"measurements\": [\n    {\n      \"statistic\": \"COUNT\",\n      \"value\": 13.0\n    }\n  ],\n  \"name\": \"fms.cache.hits\"\n}"
+      }
+    },
+    {
+      "name": "Cache misses metric",
+      "category": "Ops",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 2.22,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/actuator/metrics/fms.cache.misses",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json",
+          "Content-Length": "193",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "availableTags": [
+            {
+              "tag": "application",
+              "values": [
+                "feature-management-service"
+              ]
+            }
+          ],
+          "description": "Redis cache misses",
+          "measurements": [
+            {
+              "statistic": "COUNT",
+              "value": 8.0
+            }
+          ],
+          "name": "fms.cache.misses"
+        },
+        "body_raw": "{\n  \"availableTags\": [\n    {\n      \"tag\": \"application\",\n      \"values\": [\n        \"feature-management-service\"\n      ]\n    }\n  ],\n  \"description\": \"Redis cache misses\",\n  \"measurements\": [\n    {\n      \"statistic\": \"COUNT\",\n      \"value\": 8.0\n    }\n  ],\n  \"name\": \"fms.cache.misses\"\n}"
+      }
+    },
+    {
+      "name": "Delete flag",
+      "category": "Flags",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 13.87,
+      "request": {
+        "method": "DELETE",
+        "url": "http://localhost:8080/api/v1/flags/api-test-412810eb",
+        "headers": {
+          "Accept": "application/json",
+          "X-Actor-Id": "api-tester",
+          "X-Request-Id": "del-flag"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 204,
+        "headers": {
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": null,
+        "body_raw": null
+      }
+    },
+    {
+      "name": "Get deleted flag \u2192 404",
+      "category": "Flags",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 3.49,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/v1/flags/api-test-412810eb",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 404,
+        "headers": {
+          "Content-Type": "application/json",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "timestamp": "2026-10-08T08:56:00.710931119Z",
+          "status": 404,
+          "error": "Not Found",
+          "message": "Feature flag not found: api-test-412810eb",
+          "path": "/api/v1/flags/api-test-412810eb"
+        },
+        "body_raw": "{\n  \"timestamp\": \"2026-10-08T08:56:00.710931119Z\",\n  \"status\": 404,\n  \"error\": \"Not Found\",\n  \"message\": \"Feature flag not found: api-test-412810eb\",\n  \"path\": \"/api/v1/flags/api-test-412810eb\"\n}"
+      }
+    },
+    {
+      "name": "Evaluate deleted flag \u2192 404",
+      "category": "Evaluations",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 5.63,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/v1/evaluations/api-test-412810eb?userId=test-user-api",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 404,
+        "headers": {
+          "Content-Type": "application/json",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "timestamp": "2026-10-08T08:56:00.716754787Z",
+          "status": 404,
+          "error": "Not Found",
+          "message": "Feature flag not found: api-test-412810eb",
+          "path": "/api/v1/evaluations/api-test-412810eb"
+        },
+        "body_raw": "{\n  \"timestamp\": \"2026-10-08T08:56:00.716754787Z\",\n  \"status\": 404,\n  \"error\": \"Not Found\",\n  \"message\": \"Feature flag not found: api-test-412810eb\",\n  \"path\": \"/api/v1/evaluations/api-test-412810eb\"\n}"
+      }
+    },
+    {
+      "name": "Delete already-deleted flag \u2192 404",
+      "category": "Flags",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 3.84,
+      "request": {
+        "method": "DELETE",
+        "url": "http://localhost:8080/api/v1/flags/api-test-412810eb",
+        "headers": {
+          "Accept": "application/json",
+          "X-Actor-Id": "api-tester"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 404,
+        "headers": {
+          "Content-Type": "application/json",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "timestamp": "2026-10-08T08:56:00.720555995Z",
+          "status": 404,
+          "error": "Not Found",
+          "message": "Feature flag not found: api-test-412810eb",
+          "path": "/api/v1/flags/api-test-412810eb"
+        },
+        "body_raw": "{\n  \"timestamp\": \"2026-10-08T08:56:00.720555995Z\",\n  \"status\": 404,\n  \"error\": \"Not Found\",\n  \"message\": \"Feature flag not found: api-test-412810eb\",\n  \"path\": \"/api/v1/flags/api-test-412810eb\"\n}"
+      }
+    },
+    {
+      "name": "Seed eval beta-dashboard / user-001",
+      "category": "SeededFeatures",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 4.4,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/v1/evaluations/beta-dashboard?userId=user-001",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json",
+          "Content-Length": "86",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "flag": "beta-dashboard",
+          "userId": "user-001",
+          "enabled": false,
+          "reason": "USER_OVERRIDE"
+        },
+        "body_raw": "{\n  \"flag\": \"beta-dashboard\",\n  \"userId\": \"user-001\",\n  \"enabled\": false,\n  \"reason\": \"USER_OVERRIDE\"\n}"
+      }
+    },
+    {
+      "name": "Seed eval beta-dashboard / user-002",
+      "category": "SeededFeatures",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 4.55,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/v1/evaluations/beta-dashboard?userId=user-002",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json",
+          "Content-Length": "85",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "flag": "beta-dashboard",
+          "userId": "user-002",
+          "enabled": true,
+          "reason": "USER_OVERRIDE"
+        },
+        "body_raw": "{\n  \"flag\": \"beta-dashboard\",\n  \"userId\": \"user-002\",\n  \"enabled\": true,\n  \"reason\": \"USER_OVERRIDE\"\n}"
+      }
+    },
+    {
+      "name": "Seed eval beta-dashboard / user-003",
+      "category": "SeededFeatures",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 6.2,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/v1/evaluations/beta-dashboard?userId=user-003",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json",
+          "Content-Length": "86",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "flag": "beta-dashboard",
+          "userId": "user-003",
+          "enabled": false,
+          "reason": "USER_OVERRIDE"
+        },
+        "body_raw": "{\n  \"flag\": \"beta-dashboard\",\n  \"userId\": \"user-003\",\n  \"enabled\": false,\n  \"reason\": \"USER_OVERRIDE\"\n}"
+      }
+    },
+    {
+      "name": "Seed eval beta-dashboard / user-004",
+      "category": "SeededFeatures",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 7.75,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/v1/evaluations/beta-dashboard?userId=user-004",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json",
+          "Content-Length": "85",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "flag": "beta-dashboard",
+          "userId": "user-004",
+          "enabled": true,
+          "reason": "USER_OVERRIDE"
+        },
+        "body_raw": "{\n  \"flag\": \"beta-dashboard\",\n  \"userId\": \"user-004\",\n  \"enabled\": true,\n  \"reason\": \"USER_OVERRIDE\"\n}"
+      }
+    },
+    {
+      "name": "Seed eval new-billing / user-001",
+      "category": "SeededFeatures",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 7.04,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/v1/evaluations/new-billing?userId=user-001",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json",
+          "Content-Length": "82",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "flag": "new-billing",
+          "userId": "user-001",
+          "enabled": true,
+          "reason": "USER_OVERRIDE"
+        },
+        "body_raw": "{\n  \"flag\": \"new-billing\",\n  \"userId\": \"user-001\",\n  \"enabled\": true,\n  \"reason\": \"USER_OVERRIDE\"\n}"
+      }
+    },
+    {
+      "name": "Seed eval new-billing / user-002",
+      "category": "SeededFeatures",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 8.7,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/v1/evaluations/new-billing?userId=user-002",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json",
+          "Content-Length": "83",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "flag": "new-billing",
+          "userId": "user-002",
+          "enabled": false,
+          "reason": "USER_OVERRIDE"
+        },
+        "body_raw": "{\n  \"flag\": \"new-billing\",\n  \"userId\": \"user-002\",\n  \"enabled\": false,\n  \"reason\": \"USER_OVERRIDE\"\n}"
+      }
+    },
+    {
+      "name": "Seed eval new-billing / user-003",
+      "category": "SeededFeatures",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 7.27,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/v1/evaluations/new-billing?userId=user-003",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json",
+          "Content-Length": "82",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "flag": "new-billing",
+          "userId": "user-003",
+          "enabled": true,
+          "reason": "USER_OVERRIDE"
+        },
+        "body_raw": "{\n  \"flag\": \"new-billing\",\n  \"userId\": \"user-003\",\n  \"enabled\": true,\n  \"reason\": \"USER_OVERRIDE\"\n}"
+      }
+    },
+    {
+      "name": "Seed eval new-billing / user-004",
+      "category": "SeededFeatures",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 6.86,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/v1/evaluations/new-billing?userId=user-004",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json",
+          "Content-Length": "82",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "flag": "new-billing",
+          "userId": "user-004",
+          "enabled": true,
+          "reason": "USER_OVERRIDE"
+        },
+        "body_raw": "{\n  \"flag\": \"new-billing\",\n  \"userId\": \"user-004\",\n  \"enabled\": true,\n  \"reason\": \"USER_OVERRIDE\"\n}"
+      }
+    },
+    {
+      "name": "Seed eval ai-assistant / any-user",
+      "category": "SeededFeatures",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 8.26,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/v1/evaluations/ai-assistant?userId=any-user",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json",
+          "Content-Length": "76",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "flag": "ai-assistant",
+          "userId": "any-user",
+          "enabled": true,
+          "reason": "GLOBAL"
+        },
+        "body_raw": "{\n  \"flag\": \"ai-assistant\",\n  \"userId\": \"any-user\",\n  \"enabled\": true,\n  \"reason\": \"GLOBAL\"\n}"
+      }
+    },
+    {
+      "name": "Seed eval mobile-push / any-user",
+      "category": "SeededFeatures",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 7.81,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/v1/evaluations/mobile-push?userId=any-user",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json",
+          "Content-Length": "76",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "flag": "mobile-push",
+          "userId": "any-user",
+          "enabled": false,
+          "reason": "GLOBAL"
+        },
+        "body_raw": "{\n  \"flag\": \"mobile-push\",\n  \"userId\": \"any-user\",\n  \"enabled\": false,\n  \"reason\": \"GLOBAL\"\n}"
+      }
+    },
+    {
+      "name": "Seed eval referral-bonus / any-user",
+      "category": "SeededFeatures",
+      "pass": true,
+      "notes": [],
+      "elapsed_ms": 8.49,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/v1/evaluations/referral-bonus?userId=any-user",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null,
+        "body_raw": null
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json",
+          "Content-Length": "78",
+          "Date": "Thu, 08 Oct 2026 08:56:00 GMT"
+        },
+        "body": {
+          "flag": "referral-bonus",
+          "userId": "any-user",
+          "enabled": true,
+          "reason": "GLOBAL"
+        },
+        "body_raw": "{\n  \"flag\": \"referral-bonus\",\n  \"userId\": \"any-user\",\n  \"enabled\": true,\n  \"reason\": \"GLOBAL\"\n}"
+      }
+    }
+  ],
+  "retested_at": "2026-10-08T08:56:28.321708+00:00",
+  "known_issues": [],
+  "updated_at": "2026-10-08T09:03:58.338569+00:00",
+  "notes": "Cleared prior false failures: prometheus requires Accept text/plain (not application/json); invalid flag names must be URL-encoded."
+}
