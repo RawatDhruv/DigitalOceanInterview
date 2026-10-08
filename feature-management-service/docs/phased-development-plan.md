@@ -156,7 +156,7 @@ All five APIs work against PostgreSQL and have service-level tests.
 
 ### Database migration
 
-`002-create-feature-overrides.yaml`
+`004-create-feature-overrides.yaml`
 
 
 | Column       | Type              |

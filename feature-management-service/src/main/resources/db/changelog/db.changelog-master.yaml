@@ -5,3 +5,5 @@ databaseChangeLog:
       file: db/changelog/changes/002-alter-feature-flags-description.yaml
   - include:
       file: db/changelog/changes/003-add-feature-flags-state-and-version.yaml
+  - include:
+      file: db/changelog/changes/004-create-feature-overrides.yaml
