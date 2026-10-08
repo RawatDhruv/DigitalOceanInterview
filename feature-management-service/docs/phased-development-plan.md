@@ -88,7 +88,7 @@ Spring Boot starts, PostgreSQL is reachable, Liquibase creates the table automat
 1. Create the `FeatureFlag` JPA entity.
 2. Create `FeatureFlagRepository` extending `JpaRepository`.
 3. Implement lookup and existence checks by unique flag `name`.
-4. Add integration tests using PostgreSQL Testcontainers.
+4. Add repository integration tests (insert, lookup, update, uniqueness on `name`).
 
 ### Main classes
 

@@ -1,3 +1,7 @@
 databaseChangeLog:
   - include:
       file: db/changelog/changes/001-create-feature-flags.yaml
+  - include:
+      file: db/changelog/changes/002-alter-feature-flags-description.yaml
+  - include:
+      file: db/changelog/changes/003-add-feature-flags-state-and-version.yaml

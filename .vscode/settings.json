@@ -1,0 +1,12 @@
+{
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "java.import.gradle.enabled": true,
+  "java.import.gradle.wrapper.enabled": true,
+  "java.import.gradle.annotationProcessing.enabled": true,
+  "files.associations": {
+    "**/orchestration/helm/**/templates/*": "helm-template"
+  },
+  "[helm-template]": {
+    "yaml.validate": false
+  }
+}

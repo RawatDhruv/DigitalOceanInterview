@@ -26,8 +26,14 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-liquibase")
 	runtimeOnly("org.postgresql:postgresql")
 
+	// Lombok (Gradle equivalent of Maven optional=true)
+	compileOnly("org.projectlombok:lombok")
+	annotationProcessor("org.projectlombok:lombok")
+
 	testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
+	testCompileOnly("org.projectlombok:lombok")
+	testAnnotationProcessor("org.projectlombok:lombok")
 	testRuntimeOnly("com.h2database:h2")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }

@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-alter-feature-flags-description
+      author: feature-management-service
+      changes:
+        - modifyDataType:
+            tableName: feature_flags
+            columnName: description
+            newDataType: VARCHAR(2000)
